@@ -1,0 +1,42 @@
+{
+  "project_info": {
+    "project_number": "206429201340",
+    "firebase_url": "https://prueb-fcc24.firebaseio.com",
+    "project_id": "prueb-fcc24",
+    "storage_bucket": "prueb-fcc24.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:206429201340:android:e30595570f725667",
+        "android_client_info": {
+          "package_name": "combodedo.prueba"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "206429201340-2tr79oa76isht9u1vt14aleenof1kvd7.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD8fF2q1lRoc_q17a5PYSyoL0W240SZTUQ"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
