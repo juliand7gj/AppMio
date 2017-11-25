@@ -137,12 +137,12 @@ public class ubicacion extends AppCompatActivity implements OnMapReadyCallback, 
                     String x = leer();
                     ArrayList<PuntoRecarga> d = obtenerParadas(x);
                     for (int i = 0; i < d.size();i++){
-            //if(esCercana(latitud,longitud,d.get(i).getLatitud(), d.get(i).getLongitud())) {
+            if(esCercana(3.341917,-76.530522,d.get(i).getLatitud(), d.get(i).getLongitud())) {
                     Marker w = mMap.addMarker(new MarkerOptions()
                         .position(new LatLng(d.get(i).getLatitud(), d.get(i).getLongitud()))
                         .title(d.get(i).getNombre()));
                     puntosRecarga.add(w);
-            //}
+            }
         }
                 }else
                     for(int i = 0;i<puntosRecarga.size();i++){
@@ -329,17 +329,23 @@ public class ubicacion extends AppCompatActivity implements OnMapReadyCallback, 
 
     }
 
-    private boolean esCercana(double miLat, double miLong, double latPunto, double longPunto) {
+    private boolean esCercana(double lat1, double long1, double lat2, double long2) {
 
-        double lat = Math.abs(miLat-latPunto);
-        double lon = Math.abs(miLong-longPunto);
+        double x = 0.0;
+        double pi = Math.PI;
+        x  = Math.sin(lat1 * pi/180) *
+                Math.sin(lat2 * pi/180) +
+                Math.cos(lat1 * pi/180) *
+                        Math.cos(lat2 * pi/180) *
+                        Math.cos((long2 * pi/180) - (long1 * pi/180));
+        x  = Math.atan((Math.sqrt(1 - Math.pow(x, 2))) / x);
+        double dist = (1.852 * 60.0 * ((x/pi) * 180)) / 1.609344;
 
-        if(lat<0.01 && lon<0.01){
+        if(dist<0.8){
             return true;
         }else{
             return false;
         }
-
     }
 
     public void regreso(View v){
