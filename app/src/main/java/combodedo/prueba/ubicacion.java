@@ -230,7 +230,7 @@ public class ubicacion extends AppCompatActivity implements OnMapReadyCallback, 
         String ruta = "http://190.216.202.35:90/gtfs/realtime/";
         conexionHTTP = new ConexionHTTP(ruta);
         try {
-            Thread.sleep(5000);
+            Thread.sleep(4000);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
