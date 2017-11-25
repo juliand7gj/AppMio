@@ -1,12 +1,10 @@
 package model;
 
-import android.content.Context;
-import android.net.ConnectivityManager;
-import android.util.Log;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -16,6 +14,7 @@ import java.net.MalformedURLException;
 import java.net.PasswordAuthentication;
 import java.net.SocketTimeoutException;
 import java.net.URL;
+import java.util.ArrayList;
 
 /**
  * Created by Jorge Castaño on 19/11/2017.
@@ -24,9 +23,14 @@ import java.net.URL;
 public class ConexionHTTP extends Thread{
 
     private String respuesta;
-private HttpURLConnection urlConnection;
+    private ArrayList<Seccion> secciones;
+    private String ruta;
+    private GtfsRealtime realtime;
 
-    public ConexionHTTP() {
+    public ConexionHTTP(String ruta) {
+        realtime = new GtfsRealtime();
+        secciones = new ArrayList<>();
+        this.ruta = ruta;
         start();
     }
 
@@ -38,18 +42,16 @@ private HttpURLConnection urlConnection;
         super.run();
 
         try {
-            while (true) {
-                respuesta = clienteHttp("http://190.216.202.35:90/gtfs/realtime/");
-                sleep(30000);
+            if(ruta.equals("http://190.216.202.35:90/gtfs/realtime/")){
+                respuesta = clienteHttp(ruta);
+            }else{
+                respuesta = clienteHttp(ruta);
             }
 
-
         }catch (IOException e) {
-          e.printStackTrace();
+            e.printStackTrace();
         }
-        catch (InterruptedException e){
-            e.getStackTrace();
-        }
+
     }
 
     public String clienteHttp(String dirweb) throws IOException {
@@ -60,7 +62,9 @@ private HttpURLConnection urlConnection;
 
             URL url = new URL(dirweb);
             HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
+
             Integer codigoRespuesta = urlConnection.getResponseCode();
+            //int codigoRespuesta = 401;
 
             if(codigoRespuesta==HttpURLConnection.HTTP_UNAUTHORIZED){
                 Authenticator.setDefault(new Authenticator() {
@@ -68,13 +72,11 @@ private HttpURLConnection urlConnection;
                         return new PasswordAuthentication("appconcurso", "JcYbIry5sA".toCharArray());
                     }
                 });
+                //   url = new URL(dirweb+"vehiclePositions.pb.txt");
+                urlConnection = (HttpURLConnection) url.openConnection();
             }
 
-            url = new URL(dirweb+"vehiclePositions.pb.txt");
-            urlConnection = (HttpURLConnection) url.openConnection();
             body = readStream(urlConnection.getInputStream());
-
-
             urlConnection.disconnect();
         } catch (MalformedURLException e) {
             body = e.toString(); //Error URL incorrecta
@@ -96,14 +98,70 @@ private HttpURLConnection urlConnection;
         r = new BufferedReader(new InputStreamReader(in));
         StringBuilder total = new StringBuilder();
         String line;
-        while ((line = r.readLine()) != null) {
-            total.append(line);
+
+        if(ruta.equals("http://190.216.202.35:90/gtfs/realtime/")){
+
+            realtime.descargar("http://190.216.202.35:90/gtfs/realtime/vehiclePositions.pb");
+
+
+        }else {
+            while ((line = r.readLine()) != null) {
+                total.append(line).append("\n");
+            }
+            cargarSecciones(total.toString());
         }
+
+
         if(r != null){
             r.close();
         }
+
         in.close();
         return total.toString();
+    }
+
+    private void cargarSecciones(String respuesta) {
+        JSONObject json;
+        String nameRuta = "";
+        try {
+            json = new JSONObject(respuesta);
+            JSONObject jsonObj = json.getJSONObject("route");
+
+
+            JSONArray elem1 = jsonObj.getJSONArray("sections");
+            for (int i = 0; i < elem1.length(); i++) {
+                JSONObject mJsonObjectProperty = elem1.getJSONObject(i);
+
+                if(mJsonObjectProperty.has("name")){
+                    nameRuta = mJsonObjectProperty.getString("name");
+                }
+
+                JSONArray elem2 = mJsonObjectProperty.getJSONArray("locations");
+                for (int j = 0; j < elem2.length(); j++) {
+                    JSONObject mJsonObjectProperty2 = elem2.getJSONObject(j);
+
+                    String lon = mJsonObjectProperty2.getString("x").trim();
+                    lon = lon.substring(0,3)+"."+lon.substring(3,lon.length());
+                    String lat = mJsonObjectProperty2.getString("y").trim();
+                    lat = lat.substring(0,1)+"."+lat.substring(1,lat.length());
+
+                    Float latitud = Float.parseFloat(lat);
+                    Float longitud = Float.parseFloat(lon);
+                    String nameStation = mJsonObjectProperty2.getString("name");
+
+                    Seccion s = new Seccion(nameStation, latitud,longitud, nameRuta);
+                    secciones.add(s);
+                }
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public ArrayList<Seccion> getSecciones() { return secciones; }
+
+    public GtfsRealtime getRealtime() {
+        return realtime;
     }
 
 }
