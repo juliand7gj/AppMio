@@ -52,10 +52,12 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 
 import model.ConexionHTTP;
+import model.Parada;
 import model.PuntoRecarga;
 import model.Seccion;
 import model.Vehiculo;
@@ -68,20 +70,25 @@ public class ubicacion extends AppCompatActivity implements OnMapReadyCallback, 
     private static double longitud;
     private ArrayList<Marker> puntosRecarga;
     private ArrayList<Marker> busesVivo;
+    private ArrayList<Marker> paradas;
     private Marker seleccionado;
     private int primero;
     private LatLng sel;
     private ConexionHTTP conexionHTTP;
     private boolean activosbuses;
     private ArrayList<Seccion> secciones;
+    private HashMap<String,String> routes;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        routes = leerRutas();
         activosbuses = false;
         primero = 0;
         sel = new LatLng(0,0);
         puntosRecarga = new ArrayList<Marker>();
         busesVivo = new ArrayList<Marker>();
+        paradas = new ArrayList<Marker>();
         latitud = 0;
         longitud = 0;
 
@@ -143,17 +150,15 @@ public class ubicacion extends AppCompatActivity implements OnMapReadyCallback, 
         switch(view.getId()) {
             case R.id.checkbox_puntos:
                 if (checked) {
-
                     String x = leer();
                     ArrayList<PuntoRecarga> d = obtenerParadas(x);
                     for (int i = 0; i < d.size();i++){
-            if(esCercana(3.341917,-76.530522,d.get(i).getLatitud(), d.get(i).getLongitud())) {
-                    Marker w = mMap.addMarker(new MarkerOptions()
-                        .position(new LatLng(d.get(i).getLatitud(), d.get(i).getLongitud()))
-                        .title(d.get(i).getNombre()));
-                    puntosRecarga.add(w);
-            }
-        }
+                        if(esCercana(3.341917,-76.530522,d.get(i).getLatitud(), d.get(i).getLongitud())) {
+                             Marker w = mMap.addMarker(new MarkerOptions()
+                                 .position(new LatLng(d.get(i).getLatitud(), d.get(i).getLongitud())).title(d.get(i).getNombre()));
+                             puntosRecarga.add(w);
+                        }
+                    }
                 }else
                     for(int i = 0;i<puntosRecarga.size();i++){
                         puntosRecarga.get(i).remove();
@@ -170,10 +175,23 @@ public class ubicacion extends AppCompatActivity implements OnMapReadyCallback, 
                         busesVivo.get(i).remove();
                     }
                 break;
+            case R.id.checkbox_paradas:
+                if(checked){
+                    ArrayList<Parada> e = leerParadas();
+                    for (int i = 0; i < e.size();i++) {
+                        Marker w = mMap.addMarker(new MarkerOptions()
+                                .position(new LatLng(e.get(i).getLatitud(), e.get(i).getLongitud()))
+                                .title(e.get(i).getNombre()));
+                        paradas.add(w);
+                    }
+                }else
+                    for(int i = 0;i<paradas.size();i++){
+                        paradas.get(i).remove();
+                    }
 
+                 break;
         }
     }
-
 
     public String leer() {
         BufferedReader reader = null;
@@ -193,6 +211,7 @@ public class ubicacion extends AppCompatActivity implements OnMapReadyCallback, 
         }
         return sb.toString();
     }
+
     private ArrayList<PuntoRecarga> obtenerParadas(String respuesta) {
         JSONObject json;
         ArrayList<PuntoRecarga> recargas = new ArrayList<PuntoRecarga>();
@@ -230,6 +249,58 @@ public class ubicacion extends AppCompatActivity implements OnMapReadyCallback, 
             e.printStackTrace();
         }
         return recargas;
+    }
+
+    public HashMap<String,String> leerRutas(){
+        HashMap<String, String> rutas = new HashMap<String,String>();
+        BufferedReader reader = null;
+        StringBuilder sb = null;
+        try {
+            reader = new BufferedReader(
+                    new InputStreamReader(getAssets().open("routes.txt")));
+            sb = new StringBuilder();
+            String line = reader.readLine();
+
+            while ((line = reader.readLine()) != null) {
+                String[] ruta = line.split(",");
+                rutas.put(ruta[0],ruta[1]);
+            }
+
+            reader.close();
+        } catch (IOException e) {
+            //log the exception
+        }
+        return rutas;
+    }
+
+    public ArrayList<Parada> leerParadas() {
+        ArrayList<Parada> paradas = new ArrayList<Parada>();
+        try {
+            BufferedReader br = null;
+            br = new BufferedReader(
+                    new InputStreamReader(getAssets().open("stops.txt")));
+            br.readLine();
+            for (String linea = br.readLine(); linea != null
+                    && !linea.equals(""); linea = br.readLine()) {
+                String[] datos = linea.split(",");
+                if (datos.length == 5) {
+                    Parada parada = new Parada(datos[0], datos[1],
+                            Double.parseDouble(datos[2]),
+                            Double.parseDouble(datos[3]),
+                            Integer.parseInt(datos[4]));
+                    paradas.add(parada);
+                } else {
+                    Parada parada = new Parada(datos[0], datos[1],
+                            Double.parseDouble(datos[2]),
+                            Double.parseDouble(datos[3]),
+                            Integer.parseInt(datos[4]), datos[5], datos[6]);
+                    paradas.add(parada);
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return paradas;
     }
 
     @Override
@@ -275,12 +346,12 @@ public class ubicacion extends AppCompatActivity implements OnMapReadyCallback, 
     private void agregarActual(double lat, double lng) {
 
         LatLng coordenadas = new LatLng(lat, lng);
-        CameraUpdate miUbicacion = CameraUpdateFactory.newLatLngZoom(coordenadas, 16);
+        //CameraUpdate miUbicacion = CameraUpdateFactory.newLatLngZoom(coordenadas, 16);
         if (actual != null) actual.remove();
         actual = mMap.addMarker(new MarkerOptions()
                 .position(coordenadas)
                 .title("Tu posición actual"));
-        mMap.animateCamera(miUbicacion);
+        //mMap.animateCamera(miUbicacion);
 
     }
 
@@ -303,9 +374,9 @@ public class ubicacion extends AppCompatActivity implements OnMapReadyCallback, 
 
             ArrayList<Vehiculo> d = conexionHTTP.getRealtime().getVehiculos();
             for (int i = 0; i<d.size();i++) {
-                Toast.makeText(getApplicationContext(), d.get(i).getRuta(), Toast.LENGTH_SHORT).show();
 
-                Marker w = mMap.addMarker(new MarkerOptions().position(new LatLng(d.get(i).getLatitud(), d.get(i).getLongitud())));
+
+                Marker w = mMap.addMarker(new MarkerOptions().position(new LatLng(d.get(i).getLatitud(), d.get(i).getLongitud())).title(routes.get(d.get(i).getRuta())));
                 busesVivo.add(w);
             }
         }

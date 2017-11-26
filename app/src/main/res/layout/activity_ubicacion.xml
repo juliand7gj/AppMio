@@ -45,6 +45,19 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.98"/>
 
+    <CheckBox
+        android:id="@+id/checkbox_paradas"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Paradas"
+        android:onClick="onCheckboxClicked"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintHorizontal_bias="0.2"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.82"/>
+
     <Button
         android:id="@+id/button_regreso"
         android:layout_width="wrap_content"
