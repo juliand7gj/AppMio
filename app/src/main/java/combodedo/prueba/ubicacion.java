@@ -57,6 +57,7 @@ import java.util.Locale;
 
 import model.ConexionHTTP;
 import model.PuntoRecarga;
+import model.Seccion;
 import model.Vehiculo;
 
 public class ubicacion extends AppCompatActivity implements OnMapReadyCallback, PlaceSelectionListener {
@@ -72,6 +73,7 @@ public class ubicacion extends AppCompatActivity implements OnMapReadyCallback, 
     private LatLng sel;
     private ConexionHTTP conexionHTTP;
     private boolean activosbuses;
+    private ArrayList<Seccion> secciones;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -95,14 +97,22 @@ public class ubicacion extends AppCompatActivity implements OnMapReadyCallback, 
     }
 
     public void comollegar(View v){
-//        conexionHTTP = new ConexionHTTP(" http://tuyo.herokuapp.com/request-route?x1="+longitud+"&y1="+latitud+"&x2="+sel.longitude+"&y2="+sel.latitude+"&mode=lessBuses");
-//        try {
-//            Thread.sleep(8000);
-//        } catch (InterruptedException e) {
-//            e.printStackTrace();
-//        }
-//
-//        Toast.makeText(getApplicationContext(), conexionHTTP.getSecciones().get(1).getLatitud()+"", Toast.LENGTH_SHORT).show();
+        conexionHTTP = new ConexionHTTP(" http://tuyo.herokuapp.com/request-route?x1="+-76.530522+""+"&y1="+3.341917+""+"&x2="+sel.longitude+"&y2="+sel.latitude+"&mode=lessBuses");
+
+        try {
+            int prog = 30;
+            while(!conexionHTTP.isTerminoProceso()){
+                //Toast.makeText(getContext(), "CARGANDO", Toast.LENGTH_SHORT).show();
+                Thread.sleep(500);
+
+            }
+            onMapReady(mMap);
+
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        //Toast.makeText(getApplicationContext(), conexionHTTP.getSecciones().get(1).getLatitud()+"", Toast.LENGTH_SHORT).show();
     }
 
     @Override
@@ -228,6 +238,18 @@ public class ubicacion extends AppCompatActivity implements OnMapReadyCallback, 
         miUbucacion();
 
 
+        if(conexionHTTP!=null){
+            secciones = conexionHTTP.getSecciones();
+
+            for (int i = 0; i < secciones.size(); i++) {
+                Seccion s = secciones.get(i);
+
+                mMap.addMarker(new MarkerOptions()
+                        .position(new LatLng(s.getLatitud(), s.getLongitud()))
+                        .title(s.getNameStation() + " - " + s.getNameRuta()));
+
+            }
+        }
         // LatLng cali = new LatLng(latitud, longitud);
         //LatLngBounds centro = new LatLngBounds(
         //      new LatLng(latitud-1, longitud-1), new LatLng(latitud+1, longitud+1));
@@ -281,11 +303,10 @@ public class ubicacion extends AppCompatActivity implements OnMapReadyCallback, 
 
             ArrayList<Vehiculo> d = conexionHTTP.getRealtime().getVehiculos();
             for (int i = 0; i<d.size();i++) {
-                if(d.get(i).getRuta().equals("121")) {
-                    Marker w = mMap.addMarker(new MarkerOptions()
-                            .position(new LatLng(d.get(i).getLatitud(), d.get(i).getLongitud())));
-                    busesVivo.add(w);
-                }
+                Toast.makeText(getApplicationContext(), d.get(i).getRuta(), Toast.LENGTH_SHORT).show();
+
+                Marker w = mMap.addMarker(new MarkerOptions().position(new LatLng(d.get(i).getLatitud(), d.get(i).getLongitud())));
+                busesVivo.add(w);
             }
         }
 

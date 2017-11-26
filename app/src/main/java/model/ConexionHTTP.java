@@ -24,6 +24,7 @@ public class ConexionHTTP extends Thread{
 
     private String respuesta;
     private ArrayList<Seccion> secciones;
+    private boolean terminoProceso;
     private String ruta;
     private GtfsRealtime realtime;
 
@@ -153,9 +154,14 @@ public class ConexionHTTP extends Thread{
                     secciones.add(s);
                 }
             }
+            terminoProceso = true;
         } catch (JSONException e) {
             e.printStackTrace();
         }
+    }
+
+    public boolean isTerminoProceso() {
+        return terminoProceso;
     }
 
     public ArrayList<Seccion> getSecciones() { return secciones; }
