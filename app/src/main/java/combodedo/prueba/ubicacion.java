@@ -71,6 +71,7 @@ public class ubicacion extends AppCompatActivity implements OnMapReadyCallback, 
     private ArrayList<Marker> puntosRecarga;
     private ArrayList<Marker> busesVivo;
     private ArrayList<Marker> paradas;
+    private ArrayList<Marker> planeacion;
     private Marker seleccionado;
     private int primero;
     private LatLng sel;
@@ -89,6 +90,7 @@ public class ubicacion extends AppCompatActivity implements OnMapReadyCallback, 
         puntosRecarga = new ArrayList<Marker>();
         busesVivo = new ArrayList<Marker>();
         paradas = new ArrayList<Marker>();
+        planeacion = new ArrayList<Marker>();
         latitud = 0;
         longitud = 0;
 
@@ -101,25 +103,6 @@ public class ubicacion extends AppCompatActivity implements OnMapReadyCallback, 
         PlaceAutocompleteFragment autocompleteFragment = (PlaceAutocompleteFragment) getFragmentManager().findFragmentById(R.id.place_autocomplete_fragment);
         autocompleteFragment.setOnPlaceSelectedListener(this);
 
-    }
-
-    public void comollegar(View v){
-        conexionHTTP = new ConexionHTTP(" http://tuyo.herokuapp.com/request-route?x1="+-76.530522+""+"&y1="+3.341917+""+"&x2="+sel.longitude+"&y2="+sel.latitude+"&mode=lessBuses");
-
-        try {
-            int prog = 30;
-            while(!conexionHTTP.isTerminoProceso()){
-                //Toast.makeText(getContext(), "CARGANDO", Toast.LENGTH_SHORT).show();
-                Thread.sleep(500);
-
-            }
-            onMapReady(mMap);
-
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-
-        //Toast.makeText(getApplicationContext(), conexionHTTP.getSecciones().get(1).getLatitud()+"", Toast.LENGTH_SHORT).show();
     }
 
     @Override
@@ -190,6 +173,41 @@ public class ubicacion extends AppCompatActivity implements OnMapReadyCallback, 
                     }
 
                  break;
+            case R.id.checkbox_planear:
+                if(checked){
+                        conexionHTTP = new ConexionHTTP(" http://tuyo.herokuapp.com/request-route?x1=" + -76.530522 + "" + "&y1=" + 3.341917 + "" + "&x2=" + sel.longitude + "&y2=" + sel.latitude + "&mode=lessBuses");
+
+                        try {
+                            int prog = 30;
+                            while (!conexionHTTP.isTerminoProceso()) {
+                                //Toast.makeText(getContext(), "CARGANDO", Toast.LENGTH_SHORT).show();
+                                Thread.sleep(500);
+
+                            }
+                            if (conexionHTTP != null) {
+                                secciones = conexionHTTP.getSecciones();
+
+                                for (int i = 0; i < secciones.size(); i++) {
+                                    Seccion s = secciones.get(i);
+
+                                    Marker w = mMap.addMarker(new MarkerOptions()
+                                            .position(new LatLng(s.getLatitud(), s.getLongitud()))
+                                            .title(s.getNameStation() + " - " + s.getNameRuta()));
+                                    planeacion.add(w);
+
+                                }
+                            }
+
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+
+                }else
+
+                    for(int i = 0;i<planeacion.size();i++){
+                        planeacion.get(i).remove();
+                    }
+                    break;
         }
     }
 
@@ -308,19 +326,6 @@ public class ubicacion extends AppCompatActivity implements OnMapReadyCallback, 
         mMap = googleMap;
         miUbucacion();
 
-
-        if(conexionHTTP!=null){
-            secciones = conexionHTTP.getSecciones();
-
-            for (int i = 0; i < secciones.size(); i++) {
-                Seccion s = secciones.get(i);
-
-                mMap.addMarker(new MarkerOptions()
-                        .position(new LatLng(s.getLatitud(), s.getLongitud()))
-                        .title(s.getNameStation() + " - " + s.getNameRuta()));
-
-            }
-        }
         // LatLng cali = new LatLng(latitud, longitud);
         //LatLngBounds centro = new LatLngBounds(
         //      new LatLng(latitud-1, longitud-1), new LatLng(latitud+1, longitud+1));
@@ -373,8 +378,8 @@ public class ubicacion extends AppCompatActivity implements OnMapReadyCallback, 
             }
 
             ArrayList<Vehiculo> d = conexionHTTP.getRealtime().getVehiculos();
-            for (int i = 0; i<d.size();i++) {
 
+            for (int i = 0; i<d.size();i++) {
 
                 Marker w = mMap.addMarker(new MarkerOptions().position(new LatLng(d.get(i).getLatitud(), d.get(i).getLongitud())).title(routes.get(d.get(i).getRuta())));
                 busesVivo.add(w);
