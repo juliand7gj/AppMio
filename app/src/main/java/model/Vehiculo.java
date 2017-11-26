@@ -7,11 +7,12 @@ package model;
 public class Vehiculo {
 
     float latitud, longitud;
+    String ruta;
 
-    public Vehiculo(float latitud, float longitud){
+    public Vehiculo(float latitud, float longitud,String ruta){
         this.latitud = latitud;
         this.longitud = longitud;
-
+        this.ruta = ruta;
     }
 
     public double getLatitud() {
@@ -28,5 +29,13 @@ public class Vehiculo {
 
     public void setLongitud(float longitud) {
         this.longitud = longitud;
+    }
+
+    public String getRuta() {
+        return ruta;
+    }
+
+    public void setRuta(String ruta) {
+        this.ruta = ruta;
     }
 }

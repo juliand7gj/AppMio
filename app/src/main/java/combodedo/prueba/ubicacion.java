@@ -152,9 +152,10 @@ public class ubicacion extends AppCompatActivity implements OnMapReadyCallback, 
             case R.id.checkbox_bus:
                 if (checked) {
 
-                    //Toast.makeText(getApplicationContext(), "Logrado", Toast.LENGTH_SHORT).show();
+                    activosbuses = true;
 
                 }else
+                    activosbuses = false;
                     for(int i = 0;i<busesVivo.size();i++){
                         busesVivo.get(i).remove();
                     }
@@ -227,22 +228,6 @@ public class ubicacion extends AppCompatActivity implements OnMapReadyCallback, 
         miUbucacion();
 
 
-        String ruta = "http://190.216.202.35:90/gtfs/realtime/";
-        conexionHTTP = new ConexionHTTP(ruta);
-        try {
-            Thread.sleep(4000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-
-        ArrayList<Vehiculo> d = conexionHTTP.getRealtime().getVehiculos();
-        for (int i = 0; i<d.size();i++) {
-            Marker w = mMap.addMarker(new MarkerOptions()
-                        .position(new LatLng(d.get(i).getLatitud(), d.get(i).getLongitud())));
-            busesVivo.add(w);
-        }
-
-
         // LatLng cali = new LatLng(latitud, longitud);
         //LatLngBounds centro = new LatLngBounds(
         //      new LatLng(latitud-1, longitud-1), new LatLng(latitud+1, longitud+1));
@@ -277,6 +262,35 @@ public class ubicacion extends AppCompatActivity implements OnMapReadyCallback, 
 
     }
 
+    public void actualizarBuses(){
+
+        if(activosbuses==true){
+            if(!busesVivo.isEmpty()){
+                for(int y = 0; y < busesVivo.size();y++){
+                    busesVivo.get(y).remove();
+                }
+            }
+
+            String ruta = "http://190.216.202.35:90/gtfs/realtime/";
+            conexionHTTP = new ConexionHTTP(ruta);
+            try {
+                Thread.sleep(4000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+
+            ArrayList<Vehiculo> d = conexionHTTP.getRealtime().getVehiculos();
+            for (int i = 0; i<d.size();i++) {
+                if(d.get(i).getRuta().equals("121")) {
+                    Marker w = mMap.addMarker(new MarkerOptions()
+                            .position(new LatLng(d.get(i).getLatitud(), d.get(i).getLongitud())));
+                    busesVivo.add(w);
+                }
+            }
+        }
+
+    }
+
     private void actualizarUbicacion(Location locacion) {
         //Toast.makeText(getApplicationContext(), "Actualiza", Toast.LENGTH_SHORT).show();
         if (locacion != null) {
@@ -293,6 +307,7 @@ public class ubicacion extends AppCompatActivity implements OnMapReadyCallback, 
         @Override
         public void onLocationChanged(Location location) {
             actualizarUbicacion(location);
+            actualizarBuses();
         }
 
         @Override
