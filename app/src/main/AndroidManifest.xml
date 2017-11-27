@@ -16,13 +16,7 @@
         <activity android:name=".MainActivity" />
         <activity android:name=".registro" />
         <activity android:name=".home" />
-        <activity android:name=".ubicacion">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
+        <activity android:name=".ubicacion"></activity>
         <activity android:name=".camara" />
         <!--
              The API key for Google Maps-based APIs is defined as a string resource.
@@ -39,7 +33,15 @@
         <activity
             android:name=".MapsActivity"
             android:label="@string/title_activity_maps" />
-        <activity android:name=".Main2Activity"></activity>
+        <activity android:name=".Main2Activity" />
+        <activity android:name=".Inicio">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
     </application>
 
 </manifest>

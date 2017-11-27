@@ -1,41 +1,28 @@
 package combodedo.prueba;
 
-import android.*;
 import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
-import android.location.Address;
-import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
-import android.location.LocationProvider;
-import android.net.Uri;
+import android.os.AsyncTask;
 import android.provider.Settings;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.text.Html;
-import android.text.TextUtils;
-import android.util.Log;
-import android.view.Menu;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.CheckBox;
-import android.widget.EditText;
-import android.widget.RadioButton;
-import android.widget.TextView;
+import android.widget.RelativeLayout;
 import android.widget.Toast;
 
-import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
-import com.google.android.gms.common.GooglePlayServicesRepairableException;
 import com.google.android.gms.common.api.Status;
-import com.google.android.gms.location.places.AutocompleteFilter;
 import com.google.android.gms.location.places.Place;
-import com.google.android.gms.location.places.ui.PlaceAutocomplete;
 import com.google.android.gms.location.places.ui.PlaceAutocompleteFragment;
 import com.google.android.gms.location.places.ui.PlaceSelectionListener;
 import com.google.android.gms.maps.CameraUpdate;
@@ -44,9 +31,9 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.maps.android.kml.KmlLayer;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -55,10 +42,9 @@ import org.json.JSONObject;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
 
 import model.ConexionHTTP;
 import model.Parada;
@@ -69,15 +55,11 @@ import model.Vehiculo;
 public class ubicacion extends AppCompatActivity implements OnMapReadyCallback, PlaceSelectionListener, View.OnClickListener {
 
     private GoogleMap mMap;
-    private Marker actual;
-    private static double latitud;
-    private static double longitud;
-    private ArrayList<Marker> puntosRecarga;
-    private ArrayList<Marker> busesVivo;
-    private ArrayList<Marker> paradas;
-    private ArrayList<Marker> planeacion;
-    private Marker seleccionado;
-    private int primero;
+    private static double latitud,longitud;
+    private ArrayList<Marker> puntosRecarga,busesVivo,paradas,planeacion;
+    private Marker seleccionado,actual;
+
+    private int primero,primerZoom;
     private LatLng sel;
     private ConexionHTTP conexionHTTP;
     private boolean activosbuses;
@@ -85,8 +67,8 @@ public class ubicacion extends AppCompatActivity implements OnMapReadyCallback, 
     private HashMap<String,String> routes;
     private PlaceAutocompleteFragment autocompleteFragment;
     private AutoCompleteTextView actv;
-    private ArrayList<String> ruts;
-    private String rutaEscogida;
+    private ArrayList<String> ruts,rutasescogidas;
+    private KmlLayer layer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -94,6 +76,7 @@ public class ubicacion extends AppCompatActivity implements OnMapReadyCallback, 
         routes = leerRutas();
         activosbuses = false;
         primero = 0;
+        primerZoom = 0;
         sel = new LatLng(0,0);
         puntosRecarga = new ArrayList<Marker>();
         busesVivo = new ArrayList<Marker>();
@@ -101,7 +84,7 @@ public class ubicacion extends AppCompatActivity implements OnMapReadyCallback, 
         planeacion = new ArrayList<Marker>();
         latitud = 0;
         longitud = 0;
-        rutaEscogida="";
+        rutasescogidas= new ArrayList<String>();
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_ubicacion);
@@ -113,20 +96,42 @@ public class ubicacion extends AppCompatActivity implements OnMapReadyCallback, 
         autocompleteFragment.setOnPlaceSelectedListener(this);
         autocompleteFragment.getView().findViewById(R.id.place_autocomplete_clear_button).setOnClickListener(this);
 
+        //AutocompleteFilter filter = new AutocompleteFilter.Builder().setTypeFilter(Place.TYPE_ADMINISTRATIVE_AREA_LEVEL_3).setCountry("CO").build();
+        //autocompleteFragment.setFilter(filter);
+
 
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,android.R.layout.select_dialog_item,ruts);
         actv= (AutoCompleteTextView)findViewById(R.id.autoCompleteText);
         actv.setThreshold(1);//will start working from first character
         actv.setAdapter(adapter);//setting the adapter data into the AutoCompleteTextView
         actv.setTextColor(Color.RED);
-
     }
 
-    public void quitarfiltro(View v){
+    public void borrartodosfiltros(View v){
         activosbuses = false;
         actv.setText("");
         for(int i = 0;i<busesVivo.size();i++){
             busesVivo.get(i).remove();
+        }
+        rutasescogidas.clear();
+    }
+
+    public void quitarfiltro(View v){
+        String es = actv.getText().toString();
+        if(es!=null && !es.equals("")) {
+            for(int i = 0;i<busesVivo.size();i++){
+                if(busesVivo.get(i).getTitle().equalsIgnoreCase(es)){
+                    busesVivo.get(i).remove();
+                }
+            }
+            for (int y = 0; y<rutasescogidas.size();y++){
+                if(rutasescogidas.get(y).equalsIgnoreCase(es)){
+                    rutasescogidas.remove(y);
+                }
+            }
+            actv.setText("");
+        }else{
+            Toast.makeText(getApplicationContext(), "Escribe una ruta", Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -134,7 +139,8 @@ public class ubicacion extends AppCompatActivity implements OnMapReadyCallback, 
         String es = actv.getText().toString();
         if(es!=null && !es.equals("")) {
             activosbuses = true;
-            rutaEscogida=es;
+            rutasescogidas.add(es);
+            actv.setText("");
         }else{
             Toast.makeText(getApplicationContext(), "Escribe una ruta", Toast.LENGTH_SHORT).show();
         }
@@ -143,9 +149,6 @@ public class ubicacion extends AppCompatActivity implements OnMapReadyCallback, 
 
     @Override
     public void onClick(View view) {
-        // example : way to access view from PlaceAutoCompleteFragment
-        // ((EditText) autocompleteFragment.getView()
-        // .findViewById(R.id.place_autocomplete_search_input)).setText("");
         autocompleteFragment.setText("");
         view.setVisibility(View.GONE);
         seleccionado.remove();
@@ -165,12 +168,16 @@ public class ubicacion extends AppCompatActivity implements OnMapReadyCallback, 
             if(seleccionado!=null){
                 seleccionado.remove();
             }
-
             sel = place.getLatLng();
             String nombre = place.getName().toString();
-            seleccionado = mMap.addMarker(new MarkerOptions()
-                    .position(sel).title(nombre));
+            seleccionado = mMap.addMarker(new MarkerOptions().position(sel).title(nombre));
         }
+
+
+        if(sel.latitude<3.319858  || sel.latitude>3.498064  || sel.longitude<(-76.578741) || sel.longitude>(-76.464570)) {
+            Toast.makeText(getApplicationContext(),"Por favor selecciona un punto de Cali",Toast.LENGTH_SHORT).show();
+        }
+
     }
     @Override
     public void onError(Status status) {
@@ -186,7 +193,7 @@ public class ubicacion extends AppCompatActivity implements OnMapReadyCallback, 
                     String x = leer();
                     ArrayList<PuntoRecarga> d = obtenerParadas(x);
                     for (int i = 0; i < d.size();i++){
-                        if(esCercana(3.341917,-76.530522,d.get(i).getLatitud(), d.get(i).getLongitud())) {
+                        if(esCercana(latitud,longitud,d.get(i).getLatitud(), d.get(i).getLongitud())) {
                              Marker w = mMap.addMarker(new MarkerOptions()
                                  .position(new LatLng(d.get(i).getLatitud(), d.get(i).getLongitud())).title(d.get(i).getNombre()));
                              puntosRecarga.add(w);
@@ -199,23 +206,26 @@ public class ubicacion extends AppCompatActivity implements OnMapReadyCallback, 
                 break;
             case R.id.checkbox_bus:
                 if (checked) {
-
-                    activosbuses = true;
+                    try{
+                        layer.addLayerToMap();
+                    }catch (Exception e){
+                        e.printStackTrace();
+                    }
 
                 }else
-                    activosbuses = false;
-                    for(int i = 0;i<busesVivo.size();i++){
-                        busesVivo.get(i).remove();
-                    }
+                    layer.removeLayerFromMap();
+
                 break;
             case R.id.checkbox_paradas:
                 if(checked){
                     ArrayList<Parada> e = leerParadas();
                     for (int i = 0; i < e.size();i++) {
-                        Marker w = mMap.addMarker(new MarkerOptions()
-                                .position(new LatLng(e.get(i).getLatitud(), e.get(i).getLongitud()))
-                                .title(e.get(i).getNombre()));
-                        paradas.add(w);
+                        if(esCercana(e.get(i).getLatitud(), e.get(i).getLongitud(), latitud, longitud)) {
+                            Marker w = mMap.addMarker(new MarkerOptions()
+                                    .position(new LatLng(e.get(i).getLatitud(), e.get(i).getLongitud()))
+                                    .title(e.get(i).getNombre()));
+                            paradas.add(w);
+                        }
                     }
                 }else
                     for(int i = 0;i<paradas.size();i++){
@@ -226,7 +236,7 @@ public class ubicacion extends AppCompatActivity implements OnMapReadyCallback, 
             case R.id.checkbox_planear:
                 if(checked){
                     if(seleccionado!=null) {
-                        conexionHTTP = new ConexionHTTP(" http://tuyo.herokuapp.com/request-route?x1=" + -76.530522 + "" + "&y1=" + 3.341917 + "" + "&x2=" + sel.longitude + "&y2=" + sel.latitude + "&mode=lessBuses");
+                        conexionHTTP = new ConexionHTTP(" http://tuyo.herokuapp.com/request-route?x1=" + longitud + "" + "&y1=" + latitud + "" + "&x2=" + sel.longitude + "&y2=" + sel.latitude + "&mode=lessBuses");
 
                         try {
                             int prog = 30;
@@ -379,7 +389,26 @@ public class ubicacion extends AppCompatActivity implements OnMapReadyCallback, 
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
+                == PackageManager.PERMISSION_GRANTED) {
+            mMap.setMyLocationEnabled(true);
+        } else {
+            // Show rationale and request permission.
+        }
+
+        View locationButton = ((View) findViewById(Integer.parseInt("1")).getParent()).findViewById(Integer.parseInt("2"));
+        RelativeLayout.LayoutParams rlp = (RelativeLayout.LayoutParams) locationButton.getLayoutParams();
+        // position on right bottom
+        rlp.addRule(RelativeLayout.ALIGN_PARENT_TOP, 0);
+        rlp.addRule(RelativeLayout.ALIGN_PARENT_TOP, RelativeLayout.TRUE);
+        rlp.setMargins(0, 1360, 30, 0);
+
         miUbucacion();
+        try{
+            layer = new KmlLayer(mMap,R.raw.sitios,getApplicationContext());
+        }catch (Exception e){
+            e.printStackTrace();
+        }
 
         // LatLng cali = new LatLng(latitud, longitud);
         //LatLngBounds centro = new LatLngBounds(
@@ -406,12 +435,16 @@ public class ubicacion extends AppCompatActivity implements OnMapReadyCallback, 
     private void agregarActual(double lat, double lng) {
 
         LatLng coordenadas = new LatLng(lat, lng);
-        //CameraUpdate miUbicacion = CameraUpdateFactory.newLatLngZoom(coordenadas, 16);
-        if (actual != null) actual.remove();
-        actual = mMap.addMarker(new MarkerOptions()
-                .position(coordenadas)
-                .title("Tu posición actual"));
-        //mMap.animateCamera(miUbicacion);
+
+        if(primerZoom==0){
+            CameraUpdate miUbicacion = CameraUpdateFactory.newLatLngZoom(coordenadas, 16);
+            mMap.animateCamera(miUbicacion);
+            primerZoom=1;
+        }
+
+        //if (actual != null) actual.remove();
+        //actual = mMap.addMarker(new MarkerOptions().position(coordenadas).title("Tu posición actual"));
+
 
     }
 
@@ -435,10 +468,14 @@ public class ubicacion extends AppCompatActivity implements OnMapReadyCallback, 
             ArrayList<Vehiculo> d = conexionHTTP.getRealtime().getVehiculos();
 
             for (int i = 0; i<d.size();i++) {
-                if(routes.get(d.get(i).getRuta()).equalsIgnoreCase(rutaEscogida)) {
-                    Marker w = mMap.addMarker(new MarkerOptions().position(new LatLng(d.get(i).getLatitud(), d.get(i).getLongitud())).title(routes.get(d.get(i).getRuta())));
-                    busesVivo.add(w);
+                for(int y = 0; y < rutasescogidas.size();y++){
+
+                    if(routes.get(d.get(i).getRuta()).equalsIgnoreCase(rutasescogidas.get(y))) {
+                        Marker w = mMap.addMarker(new MarkerOptions().position(new LatLng(d.get(i).getLatitud(), d.get(i).getLongitud())).title(routes.get(d.get(i).getRuta())));
+                        busesVivo.add(w);
+                    }
                 }
+
             }
         }
 
@@ -452,14 +489,14 @@ public class ubicacion extends AppCompatActivity implements OnMapReadyCallback, 
             longitud = locacion.getLongitude();
 
             //Modificado
-            agregarActual(3.341917, -76.530522);
+            agregarActual(latitud, longitud);
         }
     }
 
     LocationListener locListener = new LocationListener() {
         @Override
         public void onLocationChanged(Location location) {
-            actualizarUbicacion(location);
+//            actualizarUbicacion(location);
             actualizarBuses();
         }
 
@@ -521,6 +558,8 @@ public class ubicacion extends AppCompatActivity implements OnMapReadyCallback, 
         startActivity(i);
         finish();
     }
+
+
 
 //    private void locationStart() {
 //        LocationManager mlocManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);

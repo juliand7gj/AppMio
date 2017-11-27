@@ -1,0 +1,181 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<kml xmlns="http://www.opengis.net/kml/2.2">
+  <Document>
+    <name>museos</name>
+    <Style id="icon-1507-7CB342-normal">
+      <IconStyle>
+        <color>ff42b37c</color>
+        <scale>1</scale>
+        <Icon>
+          <href>http://www.gstatic.com/mapspro/images/stock/503-wht-blank_maps.png</href>
+        </Icon>
+      </IconStyle>
+      <LabelStyle>
+        <scale>0</scale>
+      </LabelStyle>
+    </Style>
+    <Style id="icon-1507-7CB342-highlight">
+      <IconStyle>
+        <color>ff42b37c</color>
+        <scale>1</scale>
+        <Icon>
+          <href>http://www.gstatic.com/mapspro/images/stock/503-wht-blank_maps.png</href>
+        </Icon>
+      </IconStyle>
+      <LabelStyle>
+        <scale>1</scale>
+      </LabelStyle>
+    </Style>
+    <StyleMap id="icon-1507-7CB342">
+      <Pair>
+        <key>normal</key>
+        <styleUrl>#icon-1507-7CB342-normal</styleUrl>
+      </Pair>
+      <Pair>
+        <key>highlight</key>
+        <styleUrl>#icon-1507-7CB342-highlight</styleUrl>
+      </Pair>
+    </StyleMap>
+    <Style id="icon-1636-A52714-nodesc-normal">
+      <IconStyle>
+        <color>ff1427a5</color>
+        <scale>1</scale>
+        <Icon>
+          <href>http://www.gstatic.com/mapspro/images/stock/503-wht-blank_maps.png</href>
+        </Icon>
+      </IconStyle>
+      <LabelStyle>
+        <scale>0</scale>
+      </LabelStyle>
+      <BalloonStyle>
+        <text><![CDATA[<h3>$[name]</h3>]]></text>
+      </BalloonStyle>
+    </Style>
+    <Style id="icon-1636-A52714-nodesc-highlight">
+      <IconStyle>
+        <color>ff1427a5</color>
+        <scale>1</scale>
+        <Icon>
+          <href>http://www.gstatic.com/mapspro/images/stock/503-wht-blank_maps.png</href>
+        </Icon>
+      </IconStyle>
+      <LabelStyle>
+        <scale>1</scale>
+      </LabelStyle>
+      <BalloonStyle>
+        <text><![CDATA[<h3>$[name]</h3>]]></text>
+      </BalloonStyle>
+    </Style>
+    <StyleMap id="icon-1636-A52714-nodesc">
+      <Pair>
+        <key>normal</key>
+        <styleUrl>#icon-1636-A52714-nodesc-normal</styleUrl>
+      </Pair>
+      <Pair>
+        <key>highlight</key>
+        <styleUrl>#icon-1636-A52714-nodesc-highlight</styleUrl>
+      </Pair>
+    </StyleMap>
+    <Placemark>
+      <name>Museo Departamental de Ciencias Naturales INCIVA</name>
+      <styleUrl>#icon-1636-A52714-nodesc</styleUrl>
+      <Point>
+        <coordinates>
+          -76.5388596,3.4363475,0
+        </coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Museo del Oro Calima del Banco de la República</name>
+      <styleUrl>#icon-1636-A52714-nodesc</styleUrl>
+      <Point>
+        <coordinates>
+          -76.535685,3.44993,0
+        </coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Museo La Tertulia</name>
+      <styleUrl>#icon-1636-A52714-nodesc</styleUrl>
+      <Point>
+        <coordinates>
+          -76.5448644,3.4501762,0
+        </coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Museo Arqueólogico La Merced - MUSA</name>
+      <styleUrl>#icon-1636-A52714-nodesc</styleUrl>
+      <Point>
+        <coordinates>
+          -76.53679,3.45048,0
+        </coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Museo Caliwood</name>
+      <styleUrl>#icon-1636-A52714-nodesc</styleUrl>
+      <Point>
+        <coordinates>
+          -76.5471624,3.4504914,0
+        </coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Museo Libre de Arte Público de Colombia</name>
+      <styleUrl>#icon-1636-A52714-nodesc</styleUrl>
+      <Point>
+        <coordinates>
+          -76.5246223,3.4756225,0
+        </coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Museo de Arte Colonial y Religioso la Merced</name>
+      <styleUrl>#icon-1636-A52714-nodesc</styleUrl>
+      <Point>
+        <coordinates>
+          -76.5363814,3.4507826,0
+        </coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Museo Arqueológico Julio César Cubillos</name>
+      <styleUrl>#icon-1636-A52714-nodesc</styleUrl>
+      <Point>
+        <coordinates>
+          -76.5345178,3.3769094,0
+        </coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>CASA MUSEO DE LA CIUDAD HERNÁN MARTÍNEZ SATIZABAL</name>
+      <styleUrl>#icon-1636-A52714-nodesc</styleUrl>
+      <Point>
+        <coordinates>
+          -76.5371547,3.4499964,0
+        </coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Museo Religioso y Colonial de San Francisco</name>
+      <styleUrl>#icon-1636-A52714-nodesc</styleUrl>
+      <Point>
+        <coordinates>
+          -76.53388,3.45033,0
+        </coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Zoologico
+</name>
+      <description>Los animales más sorprendentes en tu ciudad</description>
+      <styleUrl>#icon-1507-7CB342</styleUrl>
+      <Point>
+        <coordinates>
+          -76.5569078,3.4479527,0
+        </coordinates>
+      </Point>
+    </Placemark>
+  </Document>
+</kml>

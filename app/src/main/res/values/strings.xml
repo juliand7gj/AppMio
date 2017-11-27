@@ -1,5 +1,4 @@
 <resources>
-    <string name="app_name">prueba</string>
     <string name="title_activity_maps">Map</string>
 
     <!-- TODO: Remove or change this placeholder text -->
@@ -7,5 +6,27 @@
     <string name="puntos">Puntos de recarga</string>
 
     <string name="buses">Buses</string>
+
+
+    <string name="app_name">MIO</string>
+    <string name="empezar">EMPEZAR</string>
+    <string name="terminos">Mediante el uso de esta aplicación, aceptas nuestros terminos de uso</string>
+    <string name="seleccionar_idioma">Seleccionar idioma</string>
+    <string-array name="idiomas">
+        <item>ingles</item>
+        <item>Español</item>
+    </string-array>
+    <string name="title_activity_main2">Main2Activity</string>
+    <string name="action_settings">Settings</string>
+    <string name="section_format">Mapa</string>
+    <string name="tab_text_1">Rutas</string>
+    <string name="tab_text_2">Recargas</string>
+    <string name="tab_text_3">Paradas</string>
+    <color name="darkBlue">#2979ff</color>
+    <color name="lightBlue">#20a0da</color>
+    <color name="white">#ffffff</color>
+    <string name="open">Open</string>
+    <string name="close">Close</string>
+    <!-- TODO: Remove or change this placeholder text -->
 
 </resources>

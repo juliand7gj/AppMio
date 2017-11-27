@@ -1,0 +1,577 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<kml xmlns="http://www.opengis.net/kml/2.2">
+  <Document>
+    <name>Sitios</name>
+    <description>Diferentes tipos de sitios turísticos y culturales de Cali</description>
+    <Style id="icon-1507-7CB342-normal">
+      <IconStyle>
+        <color>ff42b37c</color>
+        <scale>1</scale>
+        <Icon>
+          <href>http://www.gstatic.com/mapspro/images/stock/503-wht-blank_maps.png</href>
+        </Icon>
+      </IconStyle>
+      <LabelStyle>
+        <scale>0</scale>
+      </LabelStyle>
+    </Style>
+    <Style id="icon-1507-7CB342-highlight">
+      <IconStyle>
+        <color>ff42b37c</color>
+        <scale>1</scale>
+        <Icon>
+          <href>http://www.gstatic.com/mapspro/images/stock/503-wht-blank_maps.png</href>
+        </Icon>
+      </IconStyle>
+      <LabelStyle>
+        <scale>1</scale>
+      </LabelStyle>
+    </Style>
+    <StyleMap id="icon-1507-7CB342">
+      <Pair>
+        <key>normal</key>
+        <styleUrl>#icon-1507-7CB342-normal</styleUrl>
+      </Pair>
+      <Pair>
+        <key>highlight</key>
+        <styleUrl>#icon-1507-7CB342-highlight</styleUrl>
+      </Pair>
+    </StyleMap>
+    <Style id="icon-1599-A52714-nodesc-normal">
+      <IconStyle>
+        <color>ff1427a5</color>
+        <scale>1</scale>
+        <Icon>
+          <href>http://www.gstatic.com/mapspro/images/stock/503-wht-blank_maps.png</href>
+        </Icon>
+      </IconStyle>
+      <LabelStyle>
+        <scale>0</scale>
+      </LabelStyle>
+      <BalloonStyle>
+        <text><![CDATA[<h3>$[name]</h3>]]></text>
+      </BalloonStyle>
+    </Style>
+    <Style id="icon-1599-A52714-nodesc-highlight">
+      <IconStyle>
+        <color>ff1427a5</color>
+        <scale>1</scale>
+        <Icon>
+          <href>http://www.gstatic.com/mapspro/images/stock/503-wht-blank_maps.png</href>
+        </Icon>
+      </IconStyle>
+      <LabelStyle>
+        <scale>1</scale>
+      </LabelStyle>
+      <BalloonStyle>
+        <text><![CDATA[<h3>$[name]</h3>]]></text>
+      </BalloonStyle>
+    </Style>
+    <StyleMap id="icon-1599-A52714-nodesc">
+      <Pair>
+        <key>normal</key>
+        <styleUrl>#icon-1599-A52714-nodesc-normal</styleUrl>
+      </Pair>
+      <Pair>
+        <key>highlight</key>
+        <styleUrl>#icon-1599-A52714-nodesc-highlight</styleUrl>
+      </Pair>
+    </StyleMap>
+    <Style id="icon-1636-A52714-nodesc-normal">
+      <IconStyle>
+        <color>ff1427a5</color>
+        <scale>1</scale>
+        <Icon>
+          <href>http://www.gstatic.com/mapspro/images/stock/503-wht-blank_maps.png</href>
+        </Icon>
+      </IconStyle>
+      <LabelStyle>
+        <scale>0</scale>
+      </LabelStyle>
+      <BalloonStyle>
+        <text><![CDATA[<h3>$[name]</h3>]]></text>
+      </BalloonStyle>
+    </Style>
+    <Style id="icon-1636-A52714-nodesc-highlight">
+      <IconStyle>
+        <color>ff1427a5</color>
+        <scale>1</scale>
+        <Icon>
+          <href>http://www.gstatic.com/mapspro/images/stock/503-wht-blank_maps.png</href>
+        </Icon>
+      </IconStyle>
+      <LabelStyle>
+        <scale>1</scale>
+      </LabelStyle>
+      <BalloonStyle>
+        <text><![CDATA[<h3>$[name]</h3>]]></text>
+      </BalloonStyle>
+    </Style>
+    <StyleMap id="icon-1636-A52714-nodesc">
+      <Pair>
+        <key>normal</key>
+        <styleUrl>#icon-1636-A52714-nodesc-normal</styleUrl>
+      </Pair>
+      <Pair>
+        <key>highlight</key>
+        <styleUrl>#icon-1636-A52714-nodesc-highlight</styleUrl>
+      </Pair>
+    </StyleMap>
+    <Style id="icon-1720-A52714-nodesc-normal">
+      <IconStyle>
+        <color>ff1427a5</color>
+        <scale>1</scale>
+        <Icon>
+          <href>http://www.gstatic.com/mapspro/images/stock/503-wht-blank_maps.png</href>
+        </Icon>
+      </IconStyle>
+      <LabelStyle>
+        <scale>0</scale>
+      </LabelStyle>
+      <BalloonStyle>
+        <text><![CDATA[<h3>$[name]</h3>]]></text>
+      </BalloonStyle>
+    </Style>
+    <Style id="icon-1720-A52714-nodesc-highlight">
+      <IconStyle>
+        <color>ff1427a5</color>
+        <scale>1</scale>
+        <Icon>
+          <href>http://www.gstatic.com/mapspro/images/stock/503-wht-blank_maps.png</href>
+        </Icon>
+      </IconStyle>
+      <LabelStyle>
+        <scale>1</scale>
+      </LabelStyle>
+      <BalloonStyle>
+        <text><![CDATA[<h3>$[name]</h3>]]></text>
+      </BalloonStyle>
+    </Style>
+    <StyleMap id="icon-1720-A52714-nodesc">
+      <Pair>
+        <key>normal</key>
+        <styleUrl>#icon-1720-A52714-nodesc-normal</styleUrl>
+      </Pair>
+      <Pair>
+        <key>highlight</key>
+        <styleUrl>#icon-1720-A52714-nodesc-highlight</styleUrl>
+      </Pair>
+    </StyleMap>
+    <Style id="icon-1899-0288D1-nodesc-normal">
+      <IconStyle>
+        <color>ffd18802</color>
+        <scale>1</scale>
+        <Icon>
+          <href>http://www.gstatic.com/mapspro/images/stock/503-wht-blank_maps.png</href>
+        </Icon>
+        <hotSpot x="16" xunits="pixels" y="32" yunits="insetPixels"/>
+      </IconStyle>
+      <LabelStyle>
+        <scale>0</scale>
+      </LabelStyle>
+      <BalloonStyle>
+        <text><![CDATA[<h3>$[name]</h3>]]></text>
+      </BalloonStyle>
+    </Style>
+    <Style id="icon-1899-0288D1-nodesc-highlight">
+      <IconStyle>
+        <color>ffd18802</color>
+        <scale>1</scale>
+        <Icon>
+          <href>http://www.gstatic.com/mapspro/images/stock/503-wht-blank_maps.png</href>
+        </Icon>
+        <hotSpot x="16" xunits="pixels" y="32" yunits="insetPixels"/>
+      </IconStyle>
+      <LabelStyle>
+        <scale>1</scale>
+      </LabelStyle>
+      <BalloonStyle>
+        <text><![CDATA[<h3>$[name]</h3>]]></text>
+      </BalloonStyle>
+    </Style>
+    <StyleMap id="icon-1899-0288D1-nodesc">
+      <Pair>
+        <key>normal</key>
+        <styleUrl>#icon-1899-0288D1-nodesc-normal</styleUrl>
+      </Pair>
+      <Pair>
+        <key>highlight</key>
+        <styleUrl>#icon-1899-0288D1-nodesc-highlight</styleUrl>
+      </Pair>
+    </StyleMap>
+    <Folder>
+      <name>museos</name>
+      <Placemark>
+        <name>Museo Departamental de Ciencias Naturales INCIVA</name>
+        <styleUrl>#icon-1636-A52714-nodesc</styleUrl>
+        <Point>
+          <coordinates>
+            -76.5388596,3.4363475,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>Museo del Oro Calima del Banco de la República</name>
+        <styleUrl>#icon-1636-A52714-nodesc</styleUrl>
+        <Point>
+          <coordinates>
+            -76.535685,3.44993,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>Museo La Tertulia</name>
+        <styleUrl>#icon-1636-A52714-nodesc</styleUrl>
+        <Point>
+          <coordinates>
+            -76.5448644,3.4501762,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>Museo Arqueólogico La Merced - MUSA</name>
+        <styleUrl>#icon-1636-A52714-nodesc</styleUrl>
+        <Point>
+          <coordinates>
+            -76.53679,3.45048,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>Museo Caliwood</name>
+        <styleUrl>#icon-1636-A52714-nodesc</styleUrl>
+        <Point>
+          <coordinates>
+            -76.5471624,3.4504914,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>Museo Libre de Arte Público de Colombia</name>
+        <styleUrl>#icon-1636-A52714-nodesc</styleUrl>
+        <Point>
+          <coordinates>
+            -76.5246223,3.4756225,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>Museo de Arte Colonial y Religioso la Merced</name>
+        <styleUrl>#icon-1636-A52714-nodesc</styleUrl>
+        <Point>
+          <coordinates>
+            -76.5363814,3.4507826,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>Museo Arqueológico Julio César Cubillos</name>
+        <styleUrl>#icon-1636-A52714-nodesc</styleUrl>
+        <Point>
+          <coordinates>
+            -76.5345178,3.3769094,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>CASA MUSEO DE LA CIUDAD HERNÁN MARTÍNEZ SATIZABAL</name>
+        <styleUrl>#icon-1636-A52714-nodesc</styleUrl>
+        <Point>
+          <coordinates>
+            -76.5371547,3.4499964,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>Museo Religioso y Colonial de San Francisco</name>
+        <styleUrl>#icon-1636-A52714-nodesc</styleUrl>
+        <Point>
+          <coordinates>
+            -76.53388,3.45033,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>Zoologico
+</name>
+        <description>Los animales más sorprendentes en tu ciudad</description>
+        <styleUrl>#icon-1507-7CB342</styleUrl>
+        <Point>
+          <coordinates>
+            -76.5569078,3.4479527,0
+          </coordinates>
+        </Point>
+      </Placemark>
+    </Folder>
+    <Folder>
+      <name>Parques</name>
+      <Placemark>
+        <name>Parque de Los Poetas</name>
+        <styleUrl>#icon-1720-A52714-nodesc</styleUrl>
+        <Point>
+          <coordinates>
+            -76.5323398,3.4536948,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>Parque Cien Palos</name>
+        <styleUrl>#icon-1720-A52714-nodesc</styleUrl>
+        <Point>
+          <coordinates>
+            -76.5229636,3.4384731,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>Parque Ciudad Jardín</name>
+        <styleUrl>#icon-1720-A52714-nodesc</styleUrl>
+        <Point>
+          <coordinates>
+            -76.527618,3.3658979,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>Parque Pampalinda</name>
+        <styleUrl>#icon-1720-A52714-nodesc</styleUrl>
+        <Point>
+          <coordinates>
+            -76.5518938,3.4072099,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>Unidad Recreativa Parque Cañaverales</name>
+        <styleUrl>#icon-1720-A52714-nodesc</styleUrl>
+        <Point>
+          <coordinates>
+            -76.5243596,3.4003418,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>Parque del Ingenio</name>
+        <styleUrl>#icon-1720-A52714-nodesc</styleUrl>
+        <Point>
+          <coordinates>
+            -76.5304321,3.3868096,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>PARQUE Urapán</name>
+        <styleUrl>#icon-1720-A52714-nodesc</styleUrl>
+        <Point>
+          <coordinates>
+            -76.5365781,3.3965223,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>Parque La Alameda</name>
+        <styleUrl>#icon-1720-A52714-nodesc</styleUrl>
+        <Point>
+          <coordinates>
+            -76.5366302,3.4371902,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>Unidad Recreativa Parque del Avión</name>
+        <styleUrl>#icon-1720-A52714-nodesc</styleUrl>
+        <Point>
+          <coordinates>
+            -76.5181832,3.4691417,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>Parque Panamericano</name>
+        <styleUrl>#icon-1720-A52714-nodesc</styleUrl>
+        <Point>
+          <coordinates>
+            -76.5424149,3.4316911,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>Loma de La Cruz.</name>
+        <styleUrl>#icon-1899-0288D1-nodesc</styleUrl>
+        <Point>
+          <coordinates>
+            -76.5369942,3.4429681,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>Parque Del Perro</name>
+        <styleUrl>#icon-1899-0288D1-nodesc</styleUrl>
+        <Point>
+          <coordinates>
+            -76.5455461,3.4358476,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>Parque Natural Bataclán</name>
+        <styleUrl>#icon-1899-0288D1-nodesc</styleUrl>
+        <Point>
+          <coordinates>
+            -76.5415978,3.4720926,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>Parque Del Amor</name>
+        <styleUrl>#icon-1899-0288D1-nodesc</styleUrl>
+        <Point>
+          <coordinates>
+            -76.52195,3.4935038,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>Parque de la Babilla</name>
+        <styleUrl>#icon-1899-0288D1-nodesc</styleUrl>
+        <Point>
+          <coordinates>
+            -76.5365362,3.362889,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>Eco Parque Lago De Las Garzas</name>
+        <styleUrl>#icon-1899-0288D1-nodesc</styleUrl>
+        <Point>
+          <coordinates>
+            -76.5369626,3.3319287,0
+          </coordinates>
+        </Point>
+      </Placemark>
+    </Folder>
+    <Folder>
+      <name>Monumentos</name>
+      <Placemark>
+        <name>Plaza de Caicedo</name>
+        <styleUrl>#icon-1599-A52714-nodesc</styleUrl>
+        <Point>
+          <coordinates>
+            -76.5324511,3.4518535,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>Gato De Tejada</name>
+        <styleUrl>#icon-1599-A52714-nodesc</styleUrl>
+        <Point>
+          <coordinates>
+            -76.543,3.4513378,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>Monumento a María Mulata</name>
+        <styleUrl>#icon-1599-A52714-nodesc</styleUrl>
+        <Point>
+          <coordinates>
+            -76.5497411,3.4536726,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>Monumento Jovita</name>
+        <styleUrl>#icon-1599-A52714-nodesc</styleUrl>
+        <Point>
+          <coordinates>
+            -76.5368128,3.4406036,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>Estatua Sebastián De Belalcázar</name>
+        <styleUrl>#icon-1599-A52714-nodesc</styleUrl>
+        <Point>
+          <coordinates>
+            -76.5452014,3.4491749,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>Cristo Rey</name>
+        <styleUrl>#icon-1599-A52714-nodesc</styleUrl>
+        <Point>
+          <coordinates>
+            -76.5648552,3.4359152,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>Monumento a Benito Juarez</name>
+        <styleUrl>#icon-1599-A52714-nodesc</styleUrl>
+        <Point>
+          <coordinates>
+            -76.5100188,3.4705338,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>Monumento Al Deporte</name>
+        <styleUrl>#icon-1599-A52714-nodesc</styleUrl>
+        <Point>
+          <coordinates>
+            -76.504417,3.4760369,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>Monumento a la Solidaridad</name>
+        <styleUrl>#icon-1599-A52714-nodesc</styleUrl>
+        <Point>
+          <coordinates>
+            -76.5214246,3.4713461,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>Estadio Deportivo Cali</name>
+        <styleUrl>#icon-1599-A52714-nodesc</styleUrl>
+        <Point>
+          <coordinates>
+            -76.4170413,3.5216065,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>Estadio Pascual Guerrero</name>
+        <styleUrl>#icon-1599-A52714-nodesc</styleUrl>
+        <Point>
+          <coordinates>
+            -76.5412366,3.4299548,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>Estadio De Atletismo Pedro Grajales</name>
+        <styleUrl>#icon-1599-A52714-nodesc</styleUrl>
+        <Point>
+          <coordinates>
+            -76.5382317,3.4223159,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>Unidad Deportiva San Fernando</name>
+        <styleUrl>#icon-1599-A52714-nodesc</styleUrl>
+        <Point>
+          <coordinates>
+            -76.54205,3.431154,0
+          </coordinates>
+        </Point>
+      </Placemark>
+    </Folder>
+    <Folder>
+      <name>Capa sin nombre</name>
+    </Folder>
+  </Document>
+</kml>
