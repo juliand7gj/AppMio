@@ -62,7 +62,7 @@ import model.PuntoRecarga;
 import model.Seccion;
 import model.Vehiculo;
 
-public class ubicacion extends AppCompatActivity implements OnMapReadyCallback, PlaceSelectionListener {
+public class ubicacion extends AppCompatActivity implements OnMapReadyCallback, PlaceSelectionListener, View.OnClickListener {
 
     private GoogleMap mMap;
     private Marker actual;
@@ -79,6 +79,7 @@ public class ubicacion extends AppCompatActivity implements OnMapReadyCallback, 
     private boolean activosbuses;
     private ArrayList<Seccion> secciones;
     private HashMap<String,String> routes;
+    private PlaceAutocompleteFragment autocompleteFragment;
 
 
     @Override
@@ -100,9 +101,25 @@ public class ubicacion extends AppCompatActivity implements OnMapReadyCallback, 
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
-        PlaceAutocompleteFragment autocompleteFragment = (PlaceAutocompleteFragment) getFragmentManager().findFragmentById(R.id.place_autocomplete_fragment);
+        autocompleteFragment = (PlaceAutocompleteFragment) getFragmentManager().findFragmentById(R.id.place_autocomplete_fragment);
         autocompleteFragment.setOnPlaceSelectedListener(this);
+        autocompleteFragment.getView().findViewById(R.id.place_autocomplete_clear_button).setOnClickListener(this);
 
+    }
+
+    public void quitarfiltro(View v){
+
+    }
+
+    @Override
+    public void onClick(View view) {
+        // example : way to access view from PlaceAutoCompleteFragment
+        // ((EditText) autocompleteFragment.getView()
+        // .findViewById(R.id.place_autocomplete_search_input)).setText("");
+        autocompleteFragment.setText("");
+        view.setVisibility(View.GONE);
+        seleccionado.remove();
+        seleccionado = null;
     }
 
     @Override
@@ -115,7 +132,10 @@ public class ubicacion extends AppCompatActivity implements OnMapReadyCallback, 
                     .position(sel).title(nombre));
             primero = 1;
         }else{
-            seleccionado.remove();
+            if(seleccionado!=null){
+                seleccionado.remove();
+            }
+
             sel = place.getLatLng();
             String nombre = place.getName().toString();
             seleccionado = mMap.addMarker(new MarkerOptions()
@@ -175,6 +195,7 @@ public class ubicacion extends AppCompatActivity implements OnMapReadyCallback, 
                  break;
             case R.id.checkbox_planear:
                 if(checked){
+                    if(seleccionado!=null) {
                         conexionHTTP = new ConexionHTTP(" http://tuyo.herokuapp.com/request-route?x1=" + -76.530522 + "" + "&y1=" + 3.341917 + "" + "&x2=" + sel.longitude + "&y2=" + sel.latitude + "&mode=lessBuses");
 
                         try {
@@ -201,7 +222,10 @@ public class ubicacion extends AppCompatActivity implements OnMapReadyCallback, 
                         } catch (InterruptedException e) {
                             e.printStackTrace();
                         }
-
+                    }else{
+                        ((CheckBox) view).setChecked(false);
+                        Toast.makeText(getApplicationContext(), "Busca un sitio", Toast.LENGTH_SHORT).show();
+                    }
                 }else
 
                     for(int i = 0;i<planeacion.size();i++){
