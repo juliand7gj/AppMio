@@ -448,14 +448,12 @@ public class ubicacion extends AppCompatActivity implements OnMapReadyCallback, 
 
     }
 
-    public void actualizarBuses(){
+    public ArrayList<Vehiculo> actualizarBuses(){
+
+        ArrayList<Vehiculo> x = new ArrayList<Vehiculo>();
 
         if(activosbuses==true){
-            if(!busesVivo.isEmpty()){
-                for(int y = 0; y < busesVivo.size();y++){
-                    busesVivo.get(y).remove();
-                }
-            }
+
 
             String ruta = "http://190.216.202.35:90/gtfs/realtime/";
             conexionHTTP = new ConexionHTTP(ruta);
@@ -465,19 +463,10 @@ public class ubicacion extends AppCompatActivity implements OnMapReadyCallback, 
                 e.printStackTrace();
             }
 
-            ArrayList<Vehiculo> d = conexionHTTP.getRealtime().getVehiculos();
+            x = conexionHTTP.getRealtime().getVehiculos();
 
-            for (int i = 0; i<d.size();i++) {
-                for(int y = 0; y < rutasescogidas.size();y++){
-
-                    if(routes.get(d.get(i).getRuta()).equalsIgnoreCase(rutasescogidas.get(y))) {
-                        Marker w = mMap.addMarker(new MarkerOptions().position(new LatLng(d.get(i).getLatitud(), d.get(i).getLongitud())).title(routes.get(d.get(i).getRuta())));
-                        busesVivo.add(w);
-                    }
-                }
-
-            }
         }
+        return x;
 
     }
 
@@ -497,7 +486,8 @@ public class ubicacion extends AppCompatActivity implements OnMapReadyCallback, 
         @Override
         public void onLocationChanged(Location location) {
 //            actualizarUbicacion(location);
-            actualizarBuses();
+
+              new Actualizacion().execute();
         }
 
         @Override
@@ -560,6 +550,43 @@ public class ubicacion extends AppCompatActivity implements OnMapReadyCallback, 
     }
 
 
+
+    public class Actualizacion extends AsyncTask<URL, Void, String> {
+
+        // COMPLETED (26) Override onPreExecute to set the loading indicator to visible
+        private ArrayList<Vehiculo> x;
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            //mLoadingIndicator.setVisibility(View.VISIBLE);
+        }
+
+        @Override
+        protected String doInBackground(URL... params) {
+            x = actualizarBuses();
+            return "";
+        }
+
+        @Override
+        protected void onPostExecute(String serverCedulas) {
+            if(!busesVivo.isEmpty()){
+                for(int y = 0; y < busesVivo.size();y++){
+                    busesVivo.get(y).remove();
+                }
+            }
+
+            for (int i = 0; i<x.size();i++) {
+                for(int y = 0; y < rutasescogidas.size();y++){
+
+                    if(routes.get(x.get(i).getRuta()).equalsIgnoreCase(rutasescogidas.get(y))) {
+                        Marker w = mMap.addMarker(new MarkerOptions().position(new LatLng(x.get(i).getLatitud(), x.get(i).getLongitud())).title(routes.get(x.get(i).getRuta())));
+                        busesVivo.add(w);
+                    }
+                }
+
+            }
+        }
+    }
 
 //    private void locationStart() {
 //        LocationManager mlocManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
