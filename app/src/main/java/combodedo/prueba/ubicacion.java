@@ -5,6 +5,7 @@ import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
@@ -19,7 +20,10 @@ import android.os.Bundle;
 import android.text.Html;
 import android.text.TextUtils;
 import android.util.Log;
+import android.view.Menu;
 import android.view.View;
+import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.RadioButton;
@@ -80,10 +84,13 @@ public class ubicacion extends AppCompatActivity implements OnMapReadyCallback, 
     private ArrayList<Seccion> secciones;
     private HashMap<String,String> routes;
     private PlaceAutocompleteFragment autocompleteFragment;
-
+    private AutoCompleteTextView actv;
+    private ArrayList<String> ruts;
+    private String rutaEscogida;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        ruts = new ArrayList<String>();
         routes = leerRutas();
         activosbuses = false;
         primero = 0;
@@ -94,6 +101,7 @@ public class ubicacion extends AppCompatActivity implements OnMapReadyCallback, 
         planeacion = new ArrayList<Marker>();
         latitud = 0;
         longitud = 0;
+        rutaEscogida="";
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_ubicacion);
@@ -105,9 +113,31 @@ public class ubicacion extends AppCompatActivity implements OnMapReadyCallback, 
         autocompleteFragment.setOnPlaceSelectedListener(this);
         autocompleteFragment.getView().findViewById(R.id.place_autocomplete_clear_button).setOnClickListener(this);
 
+
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,android.R.layout.select_dialog_item,ruts);
+        actv= (AutoCompleteTextView)findViewById(R.id.autoCompleteText);
+        actv.setThreshold(1);//will start working from first character
+        actv.setAdapter(adapter);//setting the adapter data into the AutoCompleteTextView
+        actv.setTextColor(Color.RED);
+
     }
 
     public void quitarfiltro(View v){
+        activosbuses = false;
+        actv.setText("");
+        for(int i = 0;i<busesVivo.size();i++){
+            busesVivo.get(i).remove();
+        }
+    }
+
+    public void ponerfiltro(View v){
+        String es = actv.getText().toString();
+        if(es!=null && !es.equals("")) {
+            activosbuses = true;
+            rutaEscogida=es;
+        }else{
+            Toast.makeText(getApplicationContext(), "Escribe una ruta", Toast.LENGTH_SHORT).show();
+        }
 
     }
 
@@ -306,6 +336,7 @@ public class ubicacion extends AppCompatActivity implements OnMapReadyCallback, 
             while ((line = reader.readLine()) != null) {
                 String[] ruta = line.split(",");
                 rutas.put(ruta[0],ruta[1]);
+                ruts.add(ruta[1]);
             }
 
             reader.close();
@@ -404,9 +435,10 @@ public class ubicacion extends AppCompatActivity implements OnMapReadyCallback, 
             ArrayList<Vehiculo> d = conexionHTTP.getRealtime().getVehiculos();
 
             for (int i = 0; i<d.size();i++) {
-
-                Marker w = mMap.addMarker(new MarkerOptions().position(new LatLng(d.get(i).getLatitud(), d.get(i).getLongitud())).title(routes.get(d.get(i).getRuta())));
-                busesVivo.add(w);
+                if(routes.get(d.get(i).getRuta()).equalsIgnoreCase(rutaEscogida)) {
+                    Marker w = mMap.addMarker(new MarkerOptions().position(new LatLng(d.get(i).getLatitud(), d.get(i).getLongitud())).title(routes.get(d.get(i).getRuta())));
+                    busesVivo.add(w);
+                }
             }
         }
 
