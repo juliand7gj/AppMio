@@ -10,11 +10,14 @@ import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.AsyncTask;
 import android.provider.Settings;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.CheckBox;
@@ -30,6 +33,7 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
@@ -50,9 +54,14 @@ import model.ConexionHTTP;
 import model.Parada;
 import model.PuntoRecarga;
 import model.Seccion;
+import model.SitioTuristico;
 import model.Vehiculo;
 
 public class ubicacion extends AppCompatActivity implements OnMapReadyCallback, PlaceSelectionListener, View.OnClickListener {
+
+    private FloatingActionButton fab_filter, fab_money, fab_bus_stop, fab_bus, fab_nav;
+    Animation fab_open, fab_close, fab_rotate_clockwise, fab_rotate_anticlockwise;
+    private boolean isOpen = false;
 
     private GoogleMap mMap;
     private static double latitud,longitud;
@@ -105,6 +114,60 @@ public class ubicacion extends AppCompatActivity implements OnMapReadyCallback, 
         actv.setThreshold(1);//will start working from first character
         actv.setAdapter(adapter);//setting the adapter data into the AutoCompleteTextView
         actv.setTextColor(Color.RED);
+
+        fab();
+    }
+
+    public void fab() {
+
+        fab_filter = (FloatingActionButton) findViewById(R.id.fab_filter);
+        fab_money = (FloatingActionButton) findViewById(R.id.fab_money);
+        fab_bus_stop = (FloatingActionButton) findViewById(R.id.fab_bus_stop);
+        fab_bus = (FloatingActionButton) findViewById(R.id.fab_bus);
+        fab_nav = (FloatingActionButton) findViewById(R.id.fab_nav);
+
+        fab_open = AnimationUtils.loadAnimation(getApplicationContext(),R.anim.fab_open);
+        fab_close = AnimationUtils.loadAnimation(getApplicationContext(),R.anim.fab_close);
+        fab_rotate_clockwise = AnimationUtils.loadAnimation(getApplicationContext(),R.anim.rotate_clockwise);
+        fab_rotate_anticlockwise = AnimationUtils.loadAnimation(getApplicationContext(),R.anim.rotate_anticlockwise);
+
+        /*Se hace la condicion que valida si se unde el boton de filtros*/
+                fab_filter.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        if (isOpen){
+
+                            fab_nav.startAnimation(fab_close);
+                            fab_money.startAnimation(fab_close);
+                            fab_bus_stop.startAnimation(fab_close);
+                            fab_bus.startAnimation(fab_close);
+                            fab_filter.startAnimation(fab_rotate_anticlockwise);
+
+                    /*Se setea para que NO puedan ser clickeables*/
+                            fab_nav.setClickable(false);
+                            fab_money.setClickable(false);
+                            fab_bus_stop.setClickable(false);
+                            fab_bus.setClickable(false);
+                            isOpen = false;
+                        }else{
+                            fab_nav.startAnimation(fab_open);
+                            fab_money.startAnimation(fab_open);
+                            fab_bus_stop.startAnimation(fab_open);
+                            fab_bus.startAnimation(fab_open);
+                            fab_filter.startAnimation(fab_rotate_clockwise);
+
+                    /*Se setea para que puedan ser clickeables*/
+                            fab_nav.setClickable(true);
+                            fab_money.setClickable(true);
+                            fab_bus_stop.setClickable(true);
+                            fab_bus.setClickable(true);
+                            isOpen = true;
+
+
+                        }
+                    }
+                });
+
     }
 
     public void borrartodosfiltros(View v){
@@ -158,27 +221,31 @@ public class ubicacion extends AppCompatActivity implements OnMapReadyCallback, 
     @Override
     public void onPlaceSelected(Place place) {
         //Toast.makeText(getApplicationContext(), "Logrado", Toast.LENGTH_SHORT).show();
-        if(primero==0){
-            sel = place.getLatLng();
-            String nombre = place.getName().toString();
-            seleccionado = mMap.addMarker(new MarkerOptions()
-                    .position(sel).title(nombre));
-            primero = 1;
-        }else{
-            if(seleccionado!=null){
-                seleccionado.remove();
+
+            if (primero == 0) {
+                sel = place.getLatLng();
+                String nombre = place.getName().toString();
+                seleccionado = mMap.addMarker(new MarkerOptions().position(sel).title(nombre));
+                primero = 1;
+
+            } else {
+                if (seleccionado != null) {
+                    seleccionado.remove();
+                }
+                sel = place.getLatLng();
+                String nombre = place.getName().toString();
+                seleccionado = mMap.addMarker(new MarkerOptions().position(sel).title(nombre));
+
             }
-            sel = place.getLatLng();
-            String nombre = place.getName().toString();
-            seleccionado = mMap.addMarker(new MarkerOptions().position(sel).title(nombre));
-        }
 
 
-        if(sel.latitude<3.319858  || sel.latitude>3.498064  || sel.longitude<(-76.578741) || sel.longitude>(-76.464570)) {
-            Toast.makeText(getApplicationContext(),"Por favor selecciona un punto de Cali",Toast.LENGTH_SHORT).show();
-        }
+//        if(sel.latitude<3.319858  || sel.latitude>3.498064  || sel.longitude<(-76.578741) || sel.longitude>(-76.464570)) {
+//            autocompleteFragment.setText("");
+//            Toast.makeText(getApplicationContext(),"Acceso inaccesible",Toast.LENGTH_SHORT).show();
+//        }
 
     }
+
     @Override
     public void onError(Status status) {
 
@@ -223,7 +290,7 @@ public class ubicacion extends AppCompatActivity implements OnMapReadyCallback, 
                         if(esCercana(e.get(i).getLatitud(), e.get(i).getLongitud(), latitud, longitud)) {
                             Marker w = mMap.addMarker(new MarkerOptions()
                                     .position(new LatLng(e.get(i).getLatitud(), e.get(i).getLongitud()))
-                                    .title(e.get(i).getNombre()));
+                                    .title(e.get(i).getNombre()).icon(BitmapDescriptorFactory.fromResource(R.drawable.bus_stop_3)));
                             paradas.add(w);
                         }
                     }
@@ -236,43 +303,23 @@ public class ubicacion extends AppCompatActivity implements OnMapReadyCallback, 
             case R.id.checkbox_planear:
                 if(checked){
                     if(seleccionado!=null) {
-                        conexionHTTP = new ConexionHTTP(" http://tuyo.herokuapp.com/request-route?x1=" + longitud + "" + "&y1=" + latitud + "" + "&x2=" + sel.longitude + "&y2=" + sel.latitude + "&mode=lessBuses");
 
-                        try {
-                            int prog = 30;
-                            while (!conexionHTTP.isTerminoProceso()) {
-                                //Toast.makeText(getContext(), "CARGANDO", Toast.LENGTH_SHORT).show();
-                                Thread.sleep(500);
+                        new Planeacion().execute();
 
-                            }
-                            if (conexionHTTP != null) {
-                                secciones = conexionHTTP.getSecciones();
-
-                                for (int i = 0; i < secciones.size(); i++) {
-                                    Seccion s = secciones.get(i);
-
-                                    Marker w = mMap.addMarker(new MarkerOptions()
-                                            .position(new LatLng(s.getLatitud(), s.getLongitud()))
-                                            .title(s.getNameStation() + " - " + s.getNameRuta()));
-                                    planeacion.add(w);
-
-                                }
-                            }
-
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
-                        }
                     }else{
                         ((CheckBox) view).setChecked(false);
                         Toast.makeText(getApplicationContext(), "Busca un sitio", Toast.LENGTH_SHORT).show();
                     }
                 }else
-
                     for(int i = 0;i<planeacion.size();i++){
                         planeacion.get(i).remove();
                     }
                     break;
         }
+    }
+
+    public String rutaa(){
+        return "http://tuyo.herokuapp.com/request-route?x1=" + longitud + "" + "&y1=" + latitud + "" + "&x2=" + sel.longitude + "&y2=" + sel.latitude + "&mode=lessBuses";
     }
 
     public String leer() {
@@ -386,6 +433,38 @@ public class ubicacion extends AppCompatActivity implements OnMapReadyCallback, 
         return paradas;
     }
 
+    public ArrayList<SitioTuristico> leerSitios() {
+        ArrayList<SitioTuristico> sitios = new ArrayList<SitioTuristico>();
+        try {
+            BufferedReader br = null;
+            br = new BufferedReader(
+                    new InputStreamReader(getAssets().open("sitios.txt")));
+            br.readLine();
+            for (String linea = br.readLine(); linea != null; linea = br
+                    .readLine()) {
+                String[] datos = linea.split("\\|");
+                for (int a = 0; a < datos.length; a++) {
+                    datos[a] = datos[a].trim();
+                }
+                if (datos.length == 6) {
+                    SitioTuristico sitio = new SitioTuristico(datos[0],
+                            datos[1], datos[2], Double.parseDouble(datos[3]),
+                            Double.parseDouble(datos[4]), datos[5]);
+                    sitios.add(sitio);
+                }else{
+                    SitioTuristico sitio = new SitioTuristico(datos[0],
+                            datos[1], datos[2], Double.parseDouble(datos[3]),
+                            Double.parseDouble(datos[4]), datos[5], datos[6]);
+                    sitios.add(sitio);
+                }
+
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return sitios;
+    }
+
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
@@ -458,7 +537,7 @@ public class ubicacion extends AppCompatActivity implements OnMapReadyCallback, 
             String ruta = "http://190.216.202.35:90/gtfs/realtime/";
             conexionHTTP = new ConexionHTTP(ruta);
             try {
-                Thread.sleep(4000);
+                Thread.sleep(10000);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
@@ -487,7 +566,7 @@ public class ubicacion extends AppCompatActivity implements OnMapReadyCallback, 
         public void onLocationChanged(Location location) {
 //            actualizarUbicacion(location);
 
-              new Actualizacion().execute();
+              new ActualizacionBuses().execute();
         }
 
         @Override
@@ -549,15 +628,14 @@ public class ubicacion extends AppCompatActivity implements OnMapReadyCallback, 
         finish();
     }
 
-
-
-    public class Actualizacion extends AsyncTask<URL, Void, String> {
+    public class ActualizacionBuses extends AsyncTask<URL, Void, String> {
 
         // COMPLETED (26) Override onPreExecute to set the loading indicator to visible
         private ArrayList<Vehiculo> x;
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
+            //Toast.makeText(getApplicationContext(), "Buscando buses", Toast.LENGTH_LONG).show();
             //mLoadingIndicator.setVisibility(View.VISIBLE);
         }
 
@@ -579,8 +657,68 @@ public class ubicacion extends AppCompatActivity implements OnMapReadyCallback, 
                 for(int y = 0; y < rutasescogidas.size();y++){
 
                     if(routes.get(x.get(i).getRuta()).equalsIgnoreCase(rutasescogidas.get(y))) {
-                        Marker w = mMap.addMarker(new MarkerOptions().position(new LatLng(x.get(i).getLatitud(), x.get(i).getLongitud())).title(routes.get(x.get(i).getRuta())));
+                        Marker w = mMap.addMarker(new MarkerOptions().position(new LatLng(x.get(i).getLatitud(), x.get(i).getLongitud())).title(routes.get(x.get(i).getRuta())).icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_directions_bus_black_24dp)));
                         busesVivo.add(w);
+                    }
+                }
+
+            }
+            for(int a = 0; a<busesVivo.size(); a++){
+                busesVivo.get(a).showInfoWindow();
+            }
+        }
+    }
+
+    public class Planeacion extends AsyncTask<URL, Void, String> {
+
+        private boolean t = false;
+
+        // COMPLETED (26) Override onPreExecute to set the loading indicator to visible
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            Toast.makeText(getApplicationContext(), "Planeando tu ruta", Toast.LENGTH_LONG).show();
+            //mLoadingIndicator.setVisibility(View.VISIBLE);
+        }
+
+        @Override
+        protected String doInBackground(URL... params) {
+
+            conexionHTTP = new ConexionHTTP(rutaa());
+            System.out.println("------------");
+            System.out.println("en ubicacion: "+conexionHTTP.getEstado());
+                try {
+                    while (!conexionHTTP.isTerminoProceso()) {
+                        // Toast.makeText(getApplicationContext(), "CARGANDO", Toast.LENGTH_SHORT).show();
+                        Thread.sleep(500);
+                    }
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+
+            t = conexionHTTP.getEstado();
+
+            return "";
+        }
+
+        @Override
+        protected void onPostExecute(String serverCedulas) {
+
+            if(!t){
+                Toast.makeText(getApplicationContext(), "Busca un lugar en Cali", Toast.LENGTH_LONG).show();
+            }else {
+
+                if (conexionHTTP != null) {
+                    secciones = conexionHTTP.getSecciones();
+
+                    for (int i = 0; i < secciones.size(); i++) {
+                        Seccion s = secciones.get(i);
+
+                        Marker w = mMap.addMarker(new MarkerOptions()
+                                .position(new LatLng(s.getLatitud(), s.getLongitud()))
+                                .title(s.getNameStation() + " - " + s.getNameRuta()));
+                        planeacion.add(w);
+
                     }
                 }
 

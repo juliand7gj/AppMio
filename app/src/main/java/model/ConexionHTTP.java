@@ -27,11 +27,13 @@ public class ConexionHTTP extends Thread{
     private boolean terminoProceso;
     private String ruta;
     private GtfsRealtime realtime;
+    private boolean estado;
 
     public ConexionHTTP(String ruta) {
         realtime = new GtfsRealtime();
         secciones = new ArrayList<>();
         this.ruta = ruta;
+        estado = false;
         start();
     }
 
@@ -121,40 +123,44 @@ public class ConexionHTTP extends Thread{
         return total.toString();
     }
 
-    private void cargarSecciones(String respuesta) {
+    public void cargarSecciones(String respuesta) {
         JSONObject json;
         String nameRuta = "";
         try {
             json = new JSONObject(respuesta);
-            JSONObject jsonObj = json.getJSONObject("route");
+            boolean st = json.getBoolean("status");
+            setEstado(st);
+            if(estado){
+                JSONObject jsonObj = json.getJSONObject("route");
 
+                JSONArray elem1 = jsonObj.getJSONArray("sections");
+                for (int i = 0; i < elem1.length(); i++) {
+                    JSONObject mJsonObjectProperty = elem1.getJSONObject(i);
 
-            JSONArray elem1 = jsonObj.getJSONArray("sections");
-            for (int i = 0; i < elem1.length(); i++) {
-                JSONObject mJsonObjectProperty = elem1.getJSONObject(i);
+                    if (mJsonObjectProperty.has("name")) {
+                        nameRuta = mJsonObjectProperty.getString("name");
+                    }
 
-                if(mJsonObjectProperty.has("name")){
-                    nameRuta = mJsonObjectProperty.getString("name");
+                    JSONArray elem2 = mJsonObjectProperty.getJSONArray("locations");
+                    for (int j = 0; j < elem2.length(); j++) {
+                        JSONObject mJsonObjectProperty2 = elem2.getJSONObject(j);
+
+                        String lon = mJsonObjectProperty2.getString("x").trim();
+                        lon = lon.substring(0, 3) + "." + lon.substring(3, lon.length());
+                        String lat = mJsonObjectProperty2.getString("y").trim();
+                        lat = lat.substring(0, 1) + "." + lat.substring(1, lat.length());
+
+                        Float latitud = Float.parseFloat(lat);
+                        Float longitud = Float.parseFloat(lon);
+                        String nameStation = mJsonObjectProperty2.getString("name");
+
+                        Seccion s = new Seccion(nameStation, latitud, longitud, nameRuta);
+                        secciones.add(s);
+                    }
                 }
-
-                JSONArray elem2 = mJsonObjectProperty.getJSONArray("locations");
-                for (int j = 0; j < elem2.length(); j++) {
-                    JSONObject mJsonObjectProperty2 = elem2.getJSONObject(j);
-
-                    String lon = mJsonObjectProperty2.getString("x").trim();
-                    lon = lon.substring(0,3)+"."+lon.substring(3,lon.length());
-                    String lat = mJsonObjectProperty2.getString("y").trim();
-                    lat = lat.substring(0,1)+"."+lat.substring(1,lat.length());
-
-                    Float latitud = Float.parseFloat(lat);
-                    Float longitud = Float.parseFloat(lon);
-                    String nameStation = mJsonObjectProperty2.getString("name");
-
-                    Seccion s = new Seccion(nameStation, latitud,longitud, nameRuta);
-                    secciones.add(s);
                 }
-            }
-            terminoProceso = true;
+                terminoProceso = true;
+
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -168,6 +174,14 @@ public class ConexionHTTP extends Thread{
 
     public GtfsRealtime getRealtime() {
         return realtime;
+    }
+
+    public boolean getEstado(){
+        return estado;
+    }
+
+    public void setEstado(boolean x){
+        estado = x;
     }
 
 }

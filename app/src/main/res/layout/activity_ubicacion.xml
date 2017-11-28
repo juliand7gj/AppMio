@@ -130,6 +130,96 @@
         app:layout_constraintVertical_bias="0.13" />
 
 
+    <android.support.design.widget.CoordinatorLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:context="com.example.juanjo.fabbutton.MainActivity"
+        android:paddingBottom="16dp"
+        android:paddingLeft="64dp"
+        android:paddingRight="16dp"
+        android:paddingTop="16dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Hello World!"
+            />
+
+        <android.support.design.widget.FloatingActionButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom|end"
+            android:layout_marginRight="@dimen/fab_margin_right"
+            android:layout_marginBottom="260dp"
+            android:src="@drawable/ic_nav"
+            android:elevation="6dp"
+            android:id="@+id/fab_money"
+            app:pressedTranslationZ="12dp"
+            app:backgroundTint="@color/fab1_color"
+            android:visibility="invisible"
+            />
+
+        <android.support.design.widget.FloatingActionButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom|end"
+            android:layout_marginRight="@dimen/fab_margin_right"
+            android:layout_marginBottom="200dp"
+            android:src="@drawable/ic_action_name"
+            android:elevation="6dp"
+            android:id="@+id/fab_bus_stop"
+            app:pressedTranslationZ="12dp"
+            app:backgroundTint="@color/fab2_color"
+            android:visibility="invisible"
+            />
+
+        <android.support.design.widget.FloatingActionButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom|end"
+            android:layout_marginRight="@dimen/fab_margin_right"
+            android:layout_marginBottom="140dp"
+            android:src="@drawable/ic_bus_stop"
+            android:elevation="6dp"
+            android:id="@+id/fab_bus"
+            app:pressedTranslationZ="12dp"
+            app:backgroundTint="@color/fab3_color"
+            android:visibility="invisible"
+            />
+
+        <android.support.design.widget.FloatingActionButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom|end"
+            android:layout_marginRight="@dimen/fab_margin_right"
+            android:layout_marginBottom="80dp"
+            android:src="@drawable/ic_money_sign"
+            android:elevation="6dp"
+            android:id="@+id/fab_nav"
+            app:pressedTranslationZ="12dp"
+            app:backgroundTint="@color/fab4_color"
+            android:visibility="invisible"
+            />
+
+        <android.support.design.widget.FloatingActionButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom|end"
+            android:layout_marginRight="@dimen/fab_margin_right"
+            android:layout_marginBottom="20dp"
+            android:src="@drawable/ic_action_filters"
+            android:elevation="6dp"
+            android:id="@+id/fab_filter"
+            app:pressedTranslationZ="12dp"
+            app:backgroundTint="@color/colorAccent"
+            />
+
+
+    </android.support.design.widget.CoordinatorLayout>
+
 
 
 </android.support.constraint.ConstraintLayout>
