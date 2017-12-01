@@ -8,13 +8,14 @@ public class Seccion {
 
 
     float latitud, longitud;
-    String nameStation, nameRuta;
+    String nameStation, nameRuta, type;
 
-    public Seccion(String nameStation, float latitud, float longitud, String nameRuta){
+    public Seccion(String nameStation, float latitud, float longitud, String nameRuta, String type){
         this.nameRuta = nameRuta;
         this.nameStation = nameStation;
         this.latitud = latitud;
         this.longitud = longitud;
+        this.type = type;
 
     }
 
@@ -48,5 +49,13 @@ public class Seccion {
 
     public void setLongitud(float longitud) {
         this.longitud = longitud;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
     }
 }

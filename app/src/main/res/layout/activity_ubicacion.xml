@@ -6,12 +6,26 @@
     android:layout_height="match_parent"
     tools:context="combodedo.prueba.ubicacion">
 
+
     <include
         layout="@layout/activity_maps"
 
         />
 
+    <ImageView
+        android:id="@+id/imageView"
+        android:layout_width="385dp"
+        android:layout_height="62dp"
+        android:background="@color/colorPrimary"
+        app:srcCompat="@color/colorPrimary"
+        tools:layout_editor_absoluteX="1dp"
+        tools:layout_editor_absoluteY="0dp"
+        />
+
+
+
     <fragment
+        android:background="@color/white"
         android:id="@+id/place_autocomplete_fragment"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -19,44 +33,10 @@
         />
 
 
-    <LinearLayout
-        android:layout_width="160dp"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintHorizontal_bias="0.058"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.867">
-
-        <CheckBox
-            android:id="@+id/checkbox_puntos"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:onClick="onCheckboxClicked"
-            android:elevation="10dp"
-            android:text="@string/puntos" />
-
-        <CheckBox
-            android:id="@+id/checkbox_bus"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:onClick="onCheckboxClicked"
-            android:elevation="10dp"
-            android:text="Sitios turisticos" />
-
-        <CheckBox
-            android:id="@+id/checkbox_paradas"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:onClick="onCheckboxClicked"
-            android:elevation="10dp"
-            android:text="Paradas" />
-    </LinearLayout>
 
 
-    <CheckBox
+
+<!--    <CheckBox
         android:id="@+id/checkbox_planear"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -67,155 +47,177 @@
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.659" />
+        app:layout_constraintVertical_bias="0.659" />-->
 
 
-
-    <AutoCompleteTextView
-        android:id="@+id/autoCompleteText"
-        android:layout_width="220dp"
-        android:layout_height="45dp"
-        android:layout_alignParentLeft="true"
-        android:ems="10"
-        android:text=""
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintHorizontal_bias="0.08"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.13">
-    </AutoCompleteTextView>
-
-
-    <Button
-        android:id="@+id/button_quitarfiltro"
-        android:layout_width="45dp"
-        android:layout_height="45dp"
-        android:layout_centerInParent="true"
-        android:onClick="quitarfiltro"
-        android:text="X"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintHorizontal_bias="0.85"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.13" />
-
-    <Button
-        android:id="@+id/button_ponerfiltro"
-        android:layout_width="45dp"
-        android:layout_height="45dp"
-        android:layout_centerInParent="true"
-        android:onClick="ponerfiltro"
-        android:text="1"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintHorizontal_bias="0.72"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.13" />
-
-    <Button
-        android:id="@+id/button_borrartodosfiltros"
-        android:layout_width="45dp"
-        android:layout_height="45dp"
-        android:layout_centerInParent="true"
-        android:onClick="borrartodosfiltros"
-        android:text="T"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintHorizontal_bias="0.99"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.13" />
-
-
-    <android.support.design.widget.CoordinatorLayout
-        xmlns:android="http://schemas.android.com/apk/res/android"
+    <android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto"
         xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:context="com.example.juanjo.fabbutton.MainActivity"
         android:paddingBottom="16dp"
         android:paddingLeft="64dp"
         android:paddingRight="16dp"
-        android:paddingTop="16dp">
+        android:paddingTop="16dp"
+        tools:context="com.example.juanjo.fabbutton.MainActivity"
+        tools:layout_editor_absoluteX="0dp"
+        tools:layout_editor_absoluteY="0dp">
+
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/fab_plan"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom|end"
+            android:layout_marginBottom="320dp"
+            android:layout_marginRight="@dimen/fab_margin_right"
+            android:elevation="6dp"
+            android:src="@drawable/ic_nav"
+            android:tooltipText="Planea tu viaje"
+            android:visibility="invisible"
+            app:backgroundTint="@color/fab5_color"
+            app:pressedTranslationZ="12dp" />
 
         <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Hello World!"
-            />
-
-        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/tv_plan"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="bottom|end"
-            android:layout_marginRight="@dimen/fab_margin_right"
+            android:layout_marginBottom="342dp"
+            android:layout_marginRight="70dp"
+            android:text="Planea tu viaje"
+            android:elevation="6dp"
+            android:visibility="invisible"
+            android:textColor="#000000"
+            android:textSize="16sp"
+            />
+
+
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/fab_sit"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom|end"
             android:layout_marginBottom="260dp"
-            android:src="@drawable/ic_nav"
+            android:layout_marginRight="@dimen/fab_margin_right"
             android:elevation="6dp"
-            android:id="@+id/fab_money"
-            app:pressedTranslationZ="12dp"
+            android:src="@drawable/sombrilla"
+            android:tooltipText="Sitios Turisticos"
+            android:visibility="invisible"
             app:backgroundTint="@color/fab1_color"
-            android:visibility="invisible"
-            />
+            app:pressedTranslationZ="12dp" />
 
-        <android.support.design.widget.FloatingActionButton
+
+        <TextView
+            android:id="@+id/tv_sit"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="bottom|end"
-            android:layout_marginRight="@dimen/fab_margin_right"
-            android:layout_marginBottom="200dp"
-            android:src="@drawable/ic_action_name"
+            android:layout_marginBottom="282dp"
+            android:layout_marginRight="70dp"
+            android:text="Sitios Turisticos"
             android:elevation="6dp"
-            android:id="@+id/fab_bus_stop"
-            app:pressedTranslationZ="12dp"
-            app:backgroundTint="@color/fab2_color"
             android:visibility="invisible"
+            android:textColor="#000000"
+            android:textSize="16sp"
             />
 
         <android.support.design.widget.FloatingActionButton
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="bottom|end"
-            android:layout_marginRight="@dimen/fab_margin_right"
-            android:layout_marginBottom="140dp"
-            android:src="@drawable/ic_bus_stop"
-            android:elevation="6dp"
             android:id="@+id/fab_bus"
-            app:pressedTranslationZ="12dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom|end"
+            android:layout_marginBottom="200dp"
+            android:layout_marginRight="@dimen/fab_margin_right"
+            android:elevation="6dp"
+            android:src="@drawable/ic_action_name"
+            android:tooltipText="Busca buses en tiempo real"
+            android:visibility="invisible"
+            app:backgroundTint="@color/fab2_color"
+            app:pressedTranslationZ="12dp" />
+
+
+        <TextView
+            android:id="@+id/tv_bus"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom|end"
+            android:layout_marginBottom="222dp"
+            android:layout_marginRight="55dp"
+            android:text="Busca buses en tiempo real"
+            android:elevation="6dp"
+            android:visibility="invisible"
+            android:textColor="#000000"
+            android:textSize="16sp"
+            />
+
+
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/fab_bus_stop"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom|end"
+            android:layout_marginBottom="140dp"
+            android:layout_marginRight="@dimen/fab_margin_right"
+            android:elevation="6dp"
+            android:src="@drawable/ic_bus_stop"
+            android:tooltipText="Paradas y estaciones"
+            android:visibility="invisible"
             app:backgroundTint="@color/fab3_color"
-            android:visibility="invisible"
-            />
+            app:pressedTranslationZ="12dp" />
 
-        <android.support.design.widget.FloatingActionButton
+        <TextView
+            android:id="@+id/tv_bus_stop"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="bottom|end"
-            android:layout_marginRight="@dimen/fab_margin_right"
+            android:layout_marginBottom="162dp"
+            android:layout_marginRight="66dp"
+            android:text="Paradas y estaciones"
+            android:elevation="6dp"
+            android:visibility="invisible"
+            android:textColor="#000000"
+            android:textSize="16sp"
+            />
+
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/fab_money"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom|end"
             android:layout_marginBottom="80dp"
-            android:src="@drawable/ic_money_sign"
+            android:layout_marginRight="@dimen/fab_margin_right"
             android:elevation="6dp"
-            android:id="@+id/fab_nav"
-            app:pressedTranslationZ="12dp"
-            app:backgroundTint="@color/fab4_color"
+            android:src="@drawable/ic_money_sign"
+            android:tooltipText="Puntos de recarga"
             android:visibility="invisible"
-            />
+            app:backgroundTint="@color/fab4_color"
+            app:pressedTranslationZ="12dp" />
 
-        <android.support.design.widget.FloatingActionButton
+        <TextView
+            android:id="@+id/tv_money"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="bottom|end"
-            android:layout_marginRight="@dimen/fab_margin_right"
-            android:layout_marginBottom="20dp"
-            android:src="@drawable/ic_action_filters"
+            android:layout_marginBottom="102dp"
+            android:layout_marginRight="70dp"
+            android:text="Puntos de recarga"
             android:elevation="6dp"
-            android:id="@+id/fab_filter"
-            app:pressedTranslationZ="12dp"
-            app:backgroundTint="@color/colorAccent"
+            android:visibility="invisible"
+            android:textColor="#000000"
+            android:textSize="16sp"
             />
+
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/fab_filter"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom|end"
+            android:layout_marginBottom="20dp"
+            android:layout_marginRight="@dimen/fab_margin_right"
+            android:elevation="6dp"
+            android:src="@drawable/ic_action_filters"
+            app:backgroundTint="@color/colorAccent"
+            app:pressedTranslationZ="12dp" />
 
 
     </android.support.design.widget.CoordinatorLayout>

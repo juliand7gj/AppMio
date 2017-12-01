@@ -25,7 +25,8 @@ public void descargar(String dirWeb) throws IOException {
              float latitud = entity.getVehicle().getPosition().getLatitude();
              float longitud = entity.getVehicle().getPosition().getLongitude();
              String ruta = entity.getVehicle().getTrip().getRouteId();
-            Vehiculo n = new Vehiculo(latitud, longitud,ruta);
+            String stopid = entity.getVehicle().getStopId();
+            Vehiculo n = new Vehiculo(latitud, longitud,ruta,stopid);
             vehiculos.add(n);
         }
     }

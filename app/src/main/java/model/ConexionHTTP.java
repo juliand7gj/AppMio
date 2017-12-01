@@ -139,7 +139,18 @@ public class ConexionHTTP extends Thread{
 
                     if (mJsonObjectProperty.has("name")) {
                         nameRuta = mJsonObjectProperty.getString("name");
+                        if(nameRuta.equalsIgnoreCase("")){
+                            nameRuta = "Caminar";
+                        }
                     }
+
+                    String tipo = mJsonObjectProperty.getString("type");
+                    if(tipo.equalsIgnoreCase("JOURNEY")){
+                        tipo = "Bus";
+                    }else{
+                        tipo = "Caminar";
+                    }
+
 
                     JSONArray elem2 = mJsonObjectProperty.getJSONArray("locations");
                     for (int j = 0; j < elem2.length(); j++) {
@@ -154,7 +165,7 @@ public class ConexionHTTP extends Thread{
                         Float longitud = Float.parseFloat(lon);
                         String nameStation = mJsonObjectProperty2.getString("name");
 
-                        Seccion s = new Seccion(nameStation, latitud, longitud, nameRuta);
+                        Seccion s = new Seccion(nameStation, latitud, longitud, nameRuta,tipo);
                         secciones.add(s);
                     }
                 }

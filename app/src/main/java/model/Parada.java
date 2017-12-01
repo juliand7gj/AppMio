@@ -5,6 +5,8 @@ public class Parada {
     private String ubicacion, nombre, id, estacionPadre, codigoPlataforma;
     private double longitud, latitud;
     private int tipo;
+
+
     public Parada(String id, String nombre, double latitud, double longitud, int tipo, String ep, String cp) {
         super();
         this.nombre = nombre;

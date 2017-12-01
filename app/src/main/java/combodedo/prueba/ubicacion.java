@@ -1,8 +1,11 @@
 package combodedo.prueba;
 
 import android.Manifest;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.location.Location;
@@ -12,6 +15,7 @@ import android.os.AsyncTask;
 import android.provider.Settings;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -22,6 +26,7 @@ import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.CheckBox;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.common.api.Status;
@@ -33,10 +38,15 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.UiSettings;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.Polyline;
+import com.google.android.gms.maps.model.PolylineOptions;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import com.google.maps.android.kml.KmlLayer;
 
 import org.json.JSONArray;
@@ -46,6 +56,7 @@ import org.json.JSONObject;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.lang.reflect.Type;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -59,9 +70,11 @@ import model.Vehiculo;
 
 public class ubicacion extends AppCompatActivity implements OnMapReadyCallback, PlaceSelectionListener, View.OnClickListener {
 
-    private FloatingActionButton fab_filter, fab_money, fab_bus_stop, fab_bus, fab_nav;
+    private FloatingActionButton fab_filter, fab_money, fab_bus_stop, fab_bus, fab_sit, fab_plan;
     Animation fab_open, fab_close, fab_rotate_clockwise, fab_rotate_anticlockwise;
+    private TextView tvplan, tvbus, tvbusstop, tvsit, tvmoney;
     private boolean isOpen = false;
+    private boolean fabrecargas, fabparadas, fabsitio, fabplan;
 
     private GoogleMap mMap;
     private static double latitud,longitud;
@@ -78,9 +91,18 @@ public class ubicacion extends AppCompatActivity implements OnMapReadyCallback, 
     private AutoCompleteTextView actv;
     private ArrayList<String> ruts,rutasescogidas;
     private KmlLayer layer;
+    private SharedPreferences sp;
+    private SharedPreferences.Editor editor;
+    private ArrayList<Polyline> polilineas;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        sp = this.getSharedPreferences("com.example.app", Context.MODE_PRIVATE);
+        editor = sp.edit();
+        fabparadas = true;
+        fabrecargas = true;
+        fabsitio = true;
+        fabplan = true;
         ruts = new ArrayList<String>();
         routes = leerRutas();
         activosbuses = false;
@@ -91,12 +113,19 @@ public class ubicacion extends AppCompatActivity implements OnMapReadyCallback, 
         busesVivo = new ArrayList<Marker>();
         paradas = new ArrayList<Marker>();
         planeacion = new ArrayList<Marker>();
+        polilineas = new ArrayList<Polyline>();
         latitud = 0;
         longitud = 0;
         rutasescogidas= new ArrayList<String>();
 
+        Gson gson = new Gson();
+        String json = sp.getString("rutasescogidas", null);
+        Type type = new TypeToken<ArrayList<String>>() {}.getType();
+        rutasescogidas = gson.fromJson(json, type);
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_ubicacion);
+
 
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
@@ -105,217 +134,18 @@ public class ubicacion extends AppCompatActivity implements OnMapReadyCallback, 
         autocompleteFragment.setOnPlaceSelectedListener(this);
         autocompleteFragment.getView().findViewById(R.id.place_autocomplete_clear_button).setOnClickListener(this);
 
+
         //AutocompleteFilter filter = new AutocompleteFilter.Builder().setTypeFilter(Place.TYPE_ADMINISTRATIVE_AREA_LEVEL_3).setCountry("CO").build();
         //autocompleteFragment.setFilter(filter);
 
 
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,android.R.layout.select_dialog_item,ruts);
-        actv= (AutoCompleteTextView)findViewById(R.id.autoCompleteText);
-        actv.setThreshold(1);//will start working from first character
-        actv.setAdapter(adapter);//setting the adapter data into the AutoCompleteTextView
-        actv.setTextColor(Color.RED);
+//        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,android.R.layout.select_dialog_item,ruts);
+//        actv= (AutoCompleteTextView)findViewById(R.id.autoCompleteText);
+//        actv.setThreshold(1);//will start working from first character
+//        actv.setAdapter(adapter);//setting the adapter data into the AutoCompleteTextView
+//        actv.setTextColor(Color.BLACK);
 
         fab();
-    }
-
-    public void fab() {
-
-        fab_filter = (FloatingActionButton) findViewById(R.id.fab_filter);
-        fab_money = (FloatingActionButton) findViewById(R.id.fab_money);
-        fab_bus_stop = (FloatingActionButton) findViewById(R.id.fab_bus_stop);
-        fab_bus = (FloatingActionButton) findViewById(R.id.fab_bus);
-        fab_nav = (FloatingActionButton) findViewById(R.id.fab_nav);
-
-        fab_open = AnimationUtils.loadAnimation(getApplicationContext(),R.anim.fab_open);
-        fab_close = AnimationUtils.loadAnimation(getApplicationContext(),R.anim.fab_close);
-        fab_rotate_clockwise = AnimationUtils.loadAnimation(getApplicationContext(),R.anim.rotate_clockwise);
-        fab_rotate_anticlockwise = AnimationUtils.loadAnimation(getApplicationContext(),R.anim.rotate_anticlockwise);
-
-        /*Se hace la condicion que valida si se unde el boton de filtros*/
-                fab_filter.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        if (isOpen){
-
-                            fab_nav.startAnimation(fab_close);
-                            fab_money.startAnimation(fab_close);
-                            fab_bus_stop.startAnimation(fab_close);
-                            fab_bus.startAnimation(fab_close);
-                            fab_filter.startAnimation(fab_rotate_anticlockwise);
-
-                    /*Se setea para que NO puedan ser clickeables*/
-                            fab_nav.setClickable(false);
-                            fab_money.setClickable(false);
-                            fab_bus_stop.setClickable(false);
-                            fab_bus.setClickable(false);
-                            isOpen = false;
-                        }else{
-                            fab_nav.startAnimation(fab_open);
-                            fab_money.startAnimation(fab_open);
-                            fab_bus_stop.startAnimation(fab_open);
-                            fab_bus.startAnimation(fab_open);
-                            fab_filter.startAnimation(fab_rotate_clockwise);
-
-                    /*Se setea para que puedan ser clickeables*/
-                            fab_nav.setClickable(true);
-                            fab_money.setClickable(true);
-                            fab_bus_stop.setClickable(true);
-                            fab_bus.setClickable(true);
-                            isOpen = true;
-
-
-                        }
-                    }
-                });
-
-    }
-
-    public void borrartodosfiltros(View v){
-        activosbuses = false;
-        actv.setText("");
-        for(int i = 0;i<busesVivo.size();i++){
-            busesVivo.get(i).remove();
-        }
-        rutasescogidas.clear();
-    }
-
-    public void quitarfiltro(View v){
-        String es = actv.getText().toString();
-        if(es!=null && !es.equals("")) {
-            for(int i = 0;i<busesVivo.size();i++){
-                if(busesVivo.get(i).getTitle().equalsIgnoreCase(es)){
-                    busesVivo.get(i).remove();
-                }
-            }
-            for (int y = 0; y<rutasescogidas.size();y++){
-                if(rutasescogidas.get(y).equalsIgnoreCase(es)){
-                    rutasescogidas.remove(y);
-                }
-            }
-            actv.setText("");
-        }else{
-            Toast.makeText(getApplicationContext(), "Escribe una ruta", Toast.LENGTH_SHORT).show();
-        }
-    }
-
-    public void ponerfiltro(View v){
-        String es = actv.getText().toString();
-        if(es!=null && !es.equals("")) {
-            activosbuses = true;
-            rutasescogidas.add(es);
-            actv.setText("");
-        }else{
-            Toast.makeText(getApplicationContext(), "Escribe una ruta", Toast.LENGTH_SHORT).show();
-        }
-
-    }
-
-    @Override
-    public void onClick(View view) {
-        autocompleteFragment.setText("");
-        view.setVisibility(View.GONE);
-        seleccionado.remove();
-        seleccionado = null;
-    }
-
-    @Override
-    public void onPlaceSelected(Place place) {
-        //Toast.makeText(getApplicationContext(), "Logrado", Toast.LENGTH_SHORT).show();
-
-            if (primero == 0) {
-                sel = place.getLatLng();
-                String nombre = place.getName().toString();
-                seleccionado = mMap.addMarker(new MarkerOptions().position(sel).title(nombre));
-                primero = 1;
-
-            } else {
-                if (seleccionado != null) {
-                    seleccionado.remove();
-                }
-                sel = place.getLatLng();
-                String nombre = place.getName().toString();
-                seleccionado = mMap.addMarker(new MarkerOptions().position(sel).title(nombre));
-
-            }
-
-
-//        if(sel.latitude<3.319858  || sel.latitude>3.498064  || sel.longitude<(-76.578741) || sel.longitude>(-76.464570)) {
-//            autocompleteFragment.setText("");
-//            Toast.makeText(getApplicationContext(),"Acceso inaccesible",Toast.LENGTH_SHORT).show();
-//        }
-
-    }
-
-    @Override
-    public void onError(Status status) {
-
-    }
-
-    public void onCheckboxClicked(View view) {
-        boolean checked = ((CheckBox) view).isChecked();
-
-        switch(view.getId()) {
-            case R.id.checkbox_puntos:
-                if (checked) {
-                    String x = leer();
-                    ArrayList<PuntoRecarga> d = obtenerParadas(x);
-                    for (int i = 0; i < d.size();i++){
-                        if(esCercana(latitud,longitud,d.get(i).getLatitud(), d.get(i).getLongitud())) {
-                             Marker w = mMap.addMarker(new MarkerOptions()
-                                 .position(new LatLng(d.get(i).getLatitud(), d.get(i).getLongitud())).title(d.get(i).getNombre()));
-                             puntosRecarga.add(w);
-                        }
-                    }
-                }else
-                    for(int i = 0;i<puntosRecarga.size();i++){
-                        puntosRecarga.get(i).remove();
-                    }
-                break;
-            case R.id.checkbox_bus:
-                if (checked) {
-                    try{
-                        layer.addLayerToMap();
-                    }catch (Exception e){
-                        e.printStackTrace();
-                    }
-
-                }else
-                    layer.removeLayerFromMap();
-
-                break;
-            case R.id.checkbox_paradas:
-                if(checked){
-                    ArrayList<Parada> e = leerParadas();
-                    for (int i = 0; i < e.size();i++) {
-                        if(esCercana(e.get(i).getLatitud(), e.get(i).getLongitud(), latitud, longitud)) {
-                            Marker w = mMap.addMarker(new MarkerOptions()
-                                    .position(new LatLng(e.get(i).getLatitud(), e.get(i).getLongitud()))
-                                    .title(e.get(i).getNombre()).icon(BitmapDescriptorFactory.fromResource(R.drawable.bus_stop_3)));
-                            paradas.add(w);
-                        }
-                    }
-                }else
-                    for(int i = 0;i<paradas.size();i++){
-                        paradas.get(i).remove();
-                    }
-
-                 break;
-            case R.id.checkbox_planear:
-                if(checked){
-                    if(seleccionado!=null) {
-
-                        new Planeacion().execute();
-
-                    }else{
-                        ((CheckBox) view).setChecked(false);
-                        Toast.makeText(getApplicationContext(), "Busca un sitio", Toast.LENGTH_SHORT).show();
-                    }
-                }else
-                    for(int i = 0;i<planeacion.size();i++){
-                        planeacion.get(i).remove();
-                    }
-                    break;
-        }
     }
 
     public String rutaa(){
@@ -440,7 +270,7 @@ public class ubicacion extends AppCompatActivity implements OnMapReadyCallback, 
             br = new BufferedReader(
                     new InputStreamReader(getAssets().open("sitios.txt")));
             br.readLine();
-            for (String linea = br.readLine(); linea != null; linea = br
+            for (String linea = br.readLine(); linea != null && !linea.equals(""); linea = br
                     .readLine()) {
                 String[] datos = linea.split("\\|");
                 for (int a = 0; a < datos.length; a++) {
@@ -465,6 +295,385 @@ public class ubicacion extends AppCompatActivity implements OnMapReadyCallback, 
         return sitios;
     }
 
+    public void fab() {
+
+        tvplan = (TextView) findViewById(R.id.tv_plan);
+        tvsit = (TextView) findViewById(R.id.tv_sit);
+        tvbus = (TextView) findViewById(R.id.tv_bus);
+        tvbusstop = (TextView) findViewById(R.id.tv_bus_stop);
+        tvmoney = (TextView) findViewById(R.id.tv_money);
+
+        fab_filter = (FloatingActionButton) findViewById(R.id.fab_filter);
+        fab_money = (FloatingActionButton) findViewById(R.id.fab_money);
+        fab_bus_stop = (FloatingActionButton) findViewById(R.id.fab_bus_stop);
+        fab_bus = (FloatingActionButton) findViewById(R.id.fab_bus);
+        fab_sit = (FloatingActionButton) findViewById(R.id.fab_sit);
+        fab_plan = (FloatingActionButton) findViewById(R.id.fab_plan);
+
+        fab_open = AnimationUtils.loadAnimation(getApplicationContext(),R.anim.fab_open);
+        fab_close = AnimationUtils.loadAnimation(getApplicationContext(),R.anim.fab_close);
+        fab_rotate_clockwise = AnimationUtils.loadAnimation(getApplicationContext(),R.anim.rotate_clockwise);
+        fab_rotate_anticlockwise = AnimationUtils.loadAnimation(getApplicationContext(),R.anim.rotate_anticlockwise);
+
+        /*Se hace la condicion que valida si se unde el boton de filtros*/
+                fab_filter.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        if (isOpen){
+
+                            fab_sit.startAnimation(fab_close);
+                            fab_plan.startAnimation(fab_close);
+                            fab_money.startAnimation(fab_close);
+                            fab_bus_stop.startAnimation(fab_close);
+                            fab_bus.startAnimation(fab_close);
+                            fab_filter.startAnimation(fab_rotate_anticlockwise);
+
+                            tvplan.startAnimation(fab_close);
+                            tvsit.startAnimation(fab_close);
+                            tvbus.startAnimation(fab_close);
+                            tvbusstop.startAnimation(fab_close);
+                            tvmoney.startAnimation(fab_close);
+
+                    /*Se setea para que NO puedan ser clickeables*/
+                            fab_sit.setClickable(false);
+                            fab_plan.setClickable(false);
+                            fab_money.setClickable(false);
+                            fab_bus_stop.setClickable(false);
+                            fab_bus.setClickable(false);
+                            isOpen = false;
+
+                            tvplan.setClickable(false);
+                            tvsit.setClickable(false);
+                            tvmoney.setClickable(false);
+                            tvbus.setClickable(false);
+                            tvbusstop.setClickable(false);
+                        }else{
+                            fab_sit.startAnimation(fab_open);
+                            fab_plan.startAnimation(fab_open);
+                            fab_money.startAnimation(fab_open);
+                            fab_bus_stop.startAnimation(fab_open);
+                            fab_bus.startAnimation(fab_open);
+                            fab_filter.startAnimation(fab_rotate_clockwise);
+
+                            tvplan.startAnimation(fab_open);
+                            tvsit.startAnimation(fab_open);
+                            tvmoney.startAnimation(fab_open);
+                            tvbusstop.startAnimation(fab_open);
+                            tvbus.startAnimation(fab_open);
+
+                    /*Se setea para que puedan ser clickeables*/
+                            fab_sit.setClickable(true);
+                            fab_plan.setClickable(true);
+                            fab_money.setClickable(true);
+                            fab_bus_stop.setClickable(true);
+                            fab_bus.setClickable(true);
+                            isOpen = true;
+
+
+                        }
+                    }
+                });
+
+        //recarga
+        fab_money.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if(fabrecargas) {
+                    Toast.makeText(getApplicationContext(), "recarga", Toast.LENGTH_SHORT);
+                    String x = leer();
+                    ArrayList<PuntoRecarga> d = obtenerParadas(x);
+                    for (int i = 0; i < d.size(); i++) {
+              //          if (esCercana(latitud, longitud, d.get(i).getLatitud(), d.get(i).getLongitud())) {
+                            Marker w = mMap.addMarker(new MarkerOptions()
+                                    .position(new LatLng(d.get(i).getLatitud(), d.get(i).getLongitud())).title(d.get(i).getNombre()).icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_monetization_on_black_24dp)));
+                            puntosRecarga.add(w);
+                        }
+              //      }
+                    setFabRecargas();
+                }else{
+                    for(int i = 0;i<puntosRecarga.size();i++){
+                        puntosRecarga.get(i).remove();
+                    }
+                    setFabRecargas();
+                }
+            }
+        });
+
+        //paradas
+        fab_bus_stop.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if(fabparadas) {
+                    Toast.makeText(getApplicationContext(), "paradas", Toast.LENGTH_SHORT);
+                    ArrayList<Parada> e = leerParadas();
+                    for (int i = 0; i < e.size(); i++) {
+                       // if (esCercana(e.get(i).getLatitud(), e.get(i).getLongitud(), latitud, longitud)) {
+
+                            if(e.get(i).getTipo()==1){
+                                Marker w = mMap.addMarker(new MarkerOptions()
+                                        .position(new LatLng(e.get(i).getLatitud(), e.get(i).getLongitud()))
+                                        .title(e.get(i).getNombre()).icon(BitmapDescriptorFactory.fromResource(R.drawable.est_2)));
+                                paradas.add(w);
+                            } else{
+                                Marker w = mMap.addMarker(new MarkerOptions()
+                                        .position(new LatLng(e.get(i).getLatitud(), e.get(i).getLongitud()))
+                                        .title(e.get(i).getNombre()).icon(BitmapDescriptorFactory.fromResource(R.drawable.bus_stop_3)));
+                                paradas.add(w);
+                            }
+
+                        }
+                   // }
+                    setFabParadas();
+                }else{
+                    for(int i = 0;i<paradas.size();i++){
+                        paradas.get(i).remove();
+                    }
+                    setFabParadas();
+                }
+
+            }
+        });
+
+        //sitio
+        fab_sit.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if(fabsitio) {
+                    ArrayList<SitioTuristico> e = leerSitios();
+                    for (int i = 0; i < e.size(); i++) {
+                        //if (esCercana(e.get(i).getLatitud(), e.get(i).getLongitud(), latitud, longitud)) {
+
+                            if(e.get(i).getTipo().equalsIgnoreCase("cultural")){
+                                Marker w = mMap.addMarker(new MarkerOptions()
+                                        .position(new LatLng(e.get(i).getLatitud(), e.get(i).getLongitud()))
+                                        .title(e.get(i).getNombre()).icon(BitmapDescriptorFactory.fromResource(R.drawable.cultural)).snippet(e.get(i).getDireccion()+"\n"+e.get(i).getDescripcion()));
+                                paradas.add(w);
+                            }else if(e.get(i).getTipo().equalsIgnoreCase("parque")){
+                                Marker w = mMap.addMarker(new MarkerOptions()
+                                        .position(new LatLng(e.get(i).getLatitud(), e.get(i).getLongitud()))
+                                        .title(e.get(i).getNombre()).icon(BitmapDescriptorFactory.fromResource(R.drawable.parque)).snippet(e.get(i).getDireccion()+"\n"+e.get(i).getDescripcion()));
+                                paradas.add(w);
+                            }else if(e.get(i).getTipo().equalsIgnoreCase("monumento")){
+                                Marker w = mMap.addMarker(new MarkerOptions()
+                                        .position(new LatLng(e.get(i).getLatitud(), e.get(i).getLongitud()))
+                                        .title(e.get(i).getNombre()).icon(BitmapDescriptorFactory.fromResource(R.drawable.monumento)).snippet(e.get(i).getDireccion()+"\n"+e.get(i).getDescripcion()));
+                                paradas.add(w);
+                            }
+                      //  }
+                    }
+                    setFabSitio();
+                }else{
+                    for(int i = 0; i<paradas.size();i++){
+                        paradas.get(i).remove();
+                    }
+                    setFabSitio();
+                }
+
+            }
+        });
+
+
+        //buscar buses
+        fab_bus.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                buscar(view);
+            }
+        });
+
+        //plan
+        fab_plan.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                if(fabplan){
+                    if(seleccionado!=null) {
+                        new Planeacion().execute();
+                    }else{
+
+                        Toast.makeText(getApplicationContext(), "Busca un sitio", Toast.LENGTH_SHORT).show();
+                        setFabPlan(true);
+                    }
+                    setFabPlan(false);
+                }else {
+                    for (int i = 0; i < planeacion.size(); i++) {
+                        planeacion.get(i).remove();
+                    }
+                    for (int i = 0; i < polilineas.size(); i++) {
+                        polilineas.get(i).remove();
+                    }
+                    setFabPlan(true);
+                }
+
+            }
+        });
+
+    }
+
+    private void setFabRecargas() {
+        if(fabrecargas){
+            fabrecargas = false;
+        }else{
+            fabrecargas = true;
+        }
+    }
+
+    private void setFabParadas() {
+        if(fabparadas){
+            fabparadas = false;
+        }else{
+            fabparadas = true;
+        }
+    }
+
+    private void setFabSitio() {
+        if(fabsitio){
+            fabsitio = false;
+        }else{
+            fabsitio = true;
+        }
+    }
+
+    private void setFabPlan(boolean f) {
+        fabplan = f;
+    }
+
+    public void borrartodosfiltros(View v){
+        activosbuses = false;
+        actv.setText("");
+        for(int i = 0;i<busesVivo.size();i++){
+            busesVivo.get(i).remove();
+        }
+        rutasescogidas.clear();
+    }
+
+    public void quitarfiltro(View v){
+        String es = actv.getText().toString();
+        if(es!=null && !es.equals("")) {
+            for(int i = 0;i<busesVivo.size();i++){
+                if(busesVivo.get(i).getTitle().equalsIgnoreCase(es)){
+                    busesVivo.get(i).remove();
+                }
+            }
+            for (int y = 0; y<rutasescogidas.size();y++){
+                if(rutasescogidas.get(y).equalsIgnoreCase(es)){
+                    rutasescogidas.remove(y);
+                }
+            }
+            actv.setText("");
+        }else{
+            Toast.makeText(getApplicationContext(), "Escribe una ruta", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    public void ponerfiltro(View v){
+//        String es = actv.getText().toString();
+//        if(es!=null && !es.equals("")) {
+//            activosbuses = true;
+//            rutasescogidas.add(es);
+//            actv.setText("");
+//        }else{
+//            Toast.makeText(getApplicationContext(), "Escribe una ruta", Toast.LENGTH_SHORT).show();
+//        }
+
+        NotificationCompat.Builder mBuilder;
+        NotificationManager mNotifyMgr =(NotificationManager) getApplicationContext().getSystemService(NOTIFICATION_SERVICE);
+
+        int icono = R.mipmap.ic_launcher;
+        Intent i=new Intent(this, ubicacion.class);
+        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, i, 0);
+
+        mBuilder =new NotificationCompat.Builder(getApplicationContext())
+                .setContentIntent(pendingIntent)
+                .setSmallIcon(icono)
+                .setContentTitle("Titulo")
+                .setContentText("Hola que tal?")
+                .setVibrate(new long[] {50, 100})
+                .setAutoCancel(true);
+
+
+
+        mNotifyMgr.notify(1, mBuilder.build());
+
+    }
+
+    @Override
+    public void onClick(View view) {
+        autocompleteFragment.setText("");
+        for(int i = 0 ; i < planeacion.size();i++){
+            planeacion.get(i).remove();
+        }
+        for(int i = 0 ; i < polilineas.size();i++){
+            polilineas.get(i).remove();
+        }
+        view.setVisibility(View.GONE);
+        seleccionado.remove();
+        seleccionado = null;
+        setFabPlan(true);
+    }
+
+    @Override
+    public void onPlaceSelected(Place place) {
+        //Toast.makeText(getApplicationContext(), "Logrado", Toast.LENGTH_SHORT).show();
+
+            if (primero == 0) {
+                sel = place.getLatLng();
+                String nombre = place.getName().toString();
+                seleccionado = mMap.addMarker(new MarkerOptions().position(sel).title(nombre));
+                CameraUpdate miUbicacion = CameraUpdateFactory.newLatLngZoom(sel, 16);
+                mMap.animateCamera(miUbicacion);
+                primero = 1;
+
+            } else {
+                if (seleccionado != null) {
+                    seleccionado.remove();
+                }
+                sel = place.getLatLng();
+                String nombre = place.getName().toString();
+                seleccionado = mMap.addMarker(new MarkerOptions().position(sel).title(nombre));
+                CameraUpdate miUbicacion = CameraUpdateFactory.newLatLngZoom(sel, 16);
+                mMap.animateCamera(miUbicacion);
+            }
+
+
+//        if(sel.latitude<3.319858  || sel.latitude>3.498064  || sel.longitude<(-76.578741) || sel.longitude>(-76.464570)) {
+//            autocompleteFragment.setText("");
+//            Toast.makeText(getApplicationContext(),"Acceso inaccesible",Toast.LENGTH_SHORT).show();
+//        }
+
+    }
+
+    @Override
+    public void onError(Status status) {
+
+    }
+
+//    public void onCheckboxClicked(View view) {
+//        boolean checked = ((CheckBox) view).isChecked();
+//
+//        switch(view.getId()) {
+//            case R.id.checkbox_planear:
+//                if(checked){
+//                    if(seleccionado!=null) {
+//
+//                        new Planeacion().execute();
+//
+//                    }else{
+//                        ((CheckBox) view).setChecked(false);
+//                        Toast.makeText(getApplicationContext(), "Busca un sitio", Toast.LENGTH_SHORT).show();
+//                    }
+//                }else {
+//                    for (int i = 0; i < planeacion.size(); i++) {
+//                        planeacion.get(i).remove();
+//                    }
+//                    for (int i = 0; i < polilineas.size(); i++) {
+//                        polilineas.get(i).remove();
+//                    }
+//                    break;
+//                }
+//        }
+//    }
+
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
@@ -480,7 +689,7 @@ public class ubicacion extends AppCompatActivity implements OnMapReadyCallback, 
         // position on right bottom
         rlp.addRule(RelativeLayout.ALIGN_PARENT_TOP, 0);
         rlp.addRule(RelativeLayout.ALIGN_PARENT_TOP, RelativeLayout.TRUE);
-        rlp.setMargins(0, 1360, 30, 0);
+        rlp.setMargins(0, 1460, 930, 0);
 
         miUbucacion();
         try{
@@ -488,6 +697,9 @@ public class ubicacion extends AppCompatActivity implements OnMapReadyCallback, 
         }catch (Exception e){
             e.printStackTrace();
         }
+
+        mMap.getUiSettings().setCompassEnabled(false);
+        mMap.getUiSettings().setMapToolbarEnabled(false);
 
         // LatLng cali = new LatLng(latitud, longitud);
         //LatLngBounds centro = new LatLngBounds(
@@ -531,8 +743,9 @@ public class ubicacion extends AppCompatActivity implements OnMapReadyCallback, 
 
         ArrayList<Vehiculo> x = new ArrayList<Vehiculo>();
 
-        if(activosbuses==true){
+        activosbuses = sp.getBoolean("activosbuses", false);
 
+        if(activosbuses==true){
 
             String ruta = "http://190.216.202.35:90/gtfs/realtime/";
             conexionHTTP = new ConexionHTTP(ruta);
@@ -566,6 +779,17 @@ public class ubicacion extends AppCompatActivity implements OnMapReadyCallback, 
         public void onLocationChanged(Location location) {
 //            actualizarUbicacion(location);
 
+            if(rutasescogidas == null){
+                rutasescogidas = new ArrayList<String>();
+                rutasescogidas.add("A11");
+                rutasescogidas.add("E21");
+            }
+
+            System.out.println("------------");
+            for(int a = 0; a < rutasescogidas.size(); a++){
+                System.out.println(rutasescogidas.get(a));
+            }
+            System.out.println("------------");
               new ActualizacionBuses().execute();
         }
 
@@ -615,17 +839,11 @@ public class ubicacion extends AppCompatActivity implements OnMapReadyCallback, 
         x  = Math.atan((Math.sqrt(1 - Math.pow(x, 2))) / x);
         double dist = (1.852 * 60.0 * ((x/pi) * 180)) / 1.609344;
 
-        if(dist<0.8){
+        if(dist<3){
             return true;
         }else{
             return false;
         }
-    }
-
-    public void regreso(View v){
-        Intent i = new Intent(this, home.class);
-        startActivity(i);
-        finish();
     }
 
     public class ActualizacionBuses extends AsyncTask<URL, Void, String> {
@@ -653,12 +871,29 @@ public class ubicacion extends AppCompatActivity implements OnMapReadyCallback, 
                 }
             }
 
+            Gson gson = new Gson();
+            String json = sp.getString("rutasescogidas", null);
+            Type type = new TypeToken<ArrayList<String>>() {}.getType();
+            rutasescogidas = gson.fromJson(json, type);
+
+            ArrayList<Parada> par = leerParadas();
+
             for (int i = 0; i<x.size();i++) {
                 for(int y = 0; y < rutasescogidas.size();y++){
 
-                    if(routes.get(x.get(i).getRuta()).equalsIgnoreCase(rutasescogidas.get(y))) {
-                        Marker w = mMap.addMarker(new MarkerOptions().position(new LatLng(x.get(i).getLatitud(), x.get(i).getLongitud())).title(routes.get(x.get(i).getRuta())).icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_directions_bus_black_24dp)));
-                        busesVivo.add(w);
+                    if (routes.get(x.get(i).getRuta()).equalsIgnoreCase(rutasescogidas.get(y))) {
+                    boolean salir = false;
+
+                    for (int n = 0; n<par.size() && !salir;n++) {
+
+                        if(x.get(i).getStopid().equalsIgnoreCase(par.get(n).getId())) {
+                            Marker w = mMap.addMarker(new MarkerOptions().position(new LatLng(x.get(i).getLatitud(), x.get(i).getLongitud())).title(routes.get(x.get(i).getRuta()) + " - " + par.get(n).getNombre()).icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_directions_bus_black_24dp)));
+                            busesVivo.add(w);
+                            salir = true;
+                        }
+                    }
+
+
                     }
                 }
 
@@ -705,25 +940,78 @@ public class ubicacion extends AppCompatActivity implements OnMapReadyCallback, 
         protected void onPostExecute(String serverCedulas) {
 
             if(!t){
-                Toast.makeText(getApplicationContext(), "Busca un lugar en Cali", Toast.LENGTH_LONG).show();
+                Toast.makeText(getApplicationContext(), "No se ha podido planear tu viaje", Toast.LENGTH_LONG).show();
+                autocompleteFragment.setText("");
+
+                seleccionado.remove();
+                seleccionado = null;
             }else {
 
                 if (conexionHTTP != null) {
                     secciones = conexionHTTP.getSecciones();
 
+
+
                     for (int i = 0; i < secciones.size(); i++) {
                         Seccion s = secciones.get(i);
 
-                        Marker w = mMap.addMarker(new MarkerOptions()
-                                .position(new LatLng(s.getLatitud(), s.getLongitud()))
-                                .title(s.getNameStation() + " - " + s.getNameRuta()));
-                        planeacion.add(w);
+                        LatLng lalo = new LatLng(s.getLatitud(),s.getLongitud());
+                        LatLng lalo2 = null;
+                        if((i+1)<=(secciones.size()-1)) {
+                            lalo2 = new LatLng(secciones.get(i + 1).getLatitud(), secciones.get(i + 1).getLongitud());
+                        }
+
+
+                        if((i+1)<=(secciones.size()-1)){
+                            if(s.getType().equalsIgnoreCase("Caminar")) {
+                                PolylineOptions lineas = new PolylineOptions().add(lalo).add(lalo2).color(Color.rgb(00,204,00));
+                                Polyline polyline = mMap.addPolyline(lineas);
+                                polyline.setClickable(true);
+                                polilineas.add(polyline);
+                            }else{
+                                PolylineOptions lineas = new PolylineOptions().add(lalo).add(lalo2).color(Color.BLACK);
+                                Polyline polyline = mMap.addPolyline(lineas);
+                                polyline.setClickable(true);
+                                polilineas.add(polyline);
+                            }
+                        }
+
+//                        if((i + 1) <= (secciones.size() - 1) && (i + 2) <= (secciones.size() - 1)) {
+
+//                            if (!secciones.get(i + 1).getNameStation().equalsIgnoreCase(secciones.get(i + 2).getNameStation())) {
+
+                                if ((i + 1) <= (secciones.size() - 1)) {
+                                    if (secciones.get(i + 1).getType().equalsIgnoreCase("Caminar")) {
+                                        if(i==0) {
+                                            Marker w = mMap.addMarker(new MarkerOptions().position(lalo)
+                                                    .title(secciones.get(i + 1).getType() + " hasta " + secciones.get(i + 1).getNameStation()));
+                                            planeacion.add(w);
+                                        }else{
+                                            Marker w = mMap.addMarker(new MarkerOptions().position(lalo)
+                                                    .title(secciones.get(i + 1).getType() + " hasta " + secciones.get(i + 1).getNameStation()).icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_album_black_24dp)));
+                                            planeacion.add(w);
+                                        }
+                                    } else if (secciones.get(i + 1).getType().equalsIgnoreCase("Bus")) {
+                                        Marker w = mMap.addMarker(new MarkerOptions().position(lalo)
+                                                .title(secciones.get(i + 1).getType() + " hasta " + secciones.get(i + 1).getNameStation() + " en " + secciones.get(i + 1).getNameRuta()).icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_album_black_24dp)));
+                                        planeacion.add(w);
+                                    }
+                                }
+ //                           }
+ //                       }
+
 
                     }
+
                 }
 
             }
         }
+    }
+
+    public void buscar(View v){
+        Intent i = new Intent(this, buscarRutas.class);
+        startActivity(i);
     }
 
 //    private void locationStart() {
