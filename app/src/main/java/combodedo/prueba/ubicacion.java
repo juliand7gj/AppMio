@@ -997,9 +997,9 @@ public class ubicacion extends AppCompatActivity implements OnMapReadyCallback, 
                     actualplaneacion = planeacion.get(0).getPosition();
                     ant = findViewById(R.id.button_antes);
                     des = findViewById(R.id.button_despues);
-                    ant.setVisibility(View.VISIBLE);
-                    des.setVisibility(View.VISIBLE);
-                    ant.setEnabled(false);
+                    //ant.setVisibility(View.VISIBLE);
+                    //des.setVisibility(View.VISIBLE);
+                    //ant.setEnabled(false);
 
                 }
 
