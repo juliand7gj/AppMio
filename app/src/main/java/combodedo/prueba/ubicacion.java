@@ -949,12 +949,10 @@ public class ubicacion extends AppCompatActivity implements OnMapReadyCallback, 
                             if(s.getType().equalsIgnoreCase("Caminar")) {
                                 PolylineOptions lineas = new PolylineOptions().add(lalo).add(lalo2).color(Color.rgb(00,204,00));
                                 Polyline polyline = mMap.addPolyline(lineas);
-                                polyline.setClickable(true);
                                 polilineas.add(polyline);
                             }else{
                                 PolylineOptions lineas = new PolylineOptions().add(lalo).add(lalo2).color(Color.BLACK);
                                 Polyline polyline = mMap.addPolyline(lineas);
-                                polyline.setClickable(true);
                                 polilineas.add(polyline);
                             }
                         }
@@ -968,24 +966,28 @@ public class ubicacion extends AppCompatActivity implements OnMapReadyCallback, 
                                 if (secciones.get(i).getType().equalsIgnoreCase("Caminar")) {
 
                                     Marker p = mMap.addMarker(new MarkerOptions().position(new LatLng(secciones.get(i).getLatitud(), secciones.get(i).getLongitud()))
-                                            .title(secciones.get(i+1).getType() + " hasta " + secciones.get(i+1).getNameStation()));
+                                            .title(secciones.get(i).getType() + " hasta " + secciones.get(i+1).getNameStation()));
                                     planeacion.add(p);
 
                                 }else if (secciones.get(0).getType().equalsIgnoreCase("Bus")) {
                                     Marker p = mMap.addMarker(new MarkerOptions().position(new LatLng(secciones.get(i).getLatitud(), secciones.get(i).getLongitud()))
-                                            .title(secciones.get(i+1).getType() + " hasta " + secciones.get(i+1).getNameStation() + " en " + secciones.get(i+1).getNameRuta()));
+                                            .title(secciones.get(i).getType() + " hasta " + secciones.get(i+1).getNameStation() + " en " + secciones.get(i).getNameRuta()));
                                     planeacion.add(p);
                                 }
                             }else if(i>0) {
-                                if (secciones.get(i).getType().equalsIgnoreCase("Caminar")) {
-                                    Marker w = mMap.addMarker(new MarkerOptions().position(new LatLng(secciones.get(i).getLatitud(), secciones.get(i).getLongitud()))
-                                            .title(secciones.get(i + 1).getType() + " hasta " + secciones.get(i + 1).getNameStation()).icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_album_black_24dp)));
-                                    planeacion.add(w);
-                                } else if (secciones.get(i).getType().equalsIgnoreCase("Bus")) {
-                                    Marker w = mMap.addMarker(new MarkerOptions().position(new LatLng(secciones.get(i).getLatitud(), secciones.get(i).getLongitud()))
-                                            .title(secciones.get(i + 1).getType() + " hasta " + secciones.get(i + 1).getNameStation() + " en " + secciones.get(i + 1).getNameRuta()).icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_album_black_24dp)));
-                                    planeacion.add(w);
-                                }
+
+                                    if (secciones.get(i).getType().equalsIgnoreCase("Caminar")) {
+                                        Marker w = mMap.addMarker(new MarkerOptions().position(new LatLng(secciones.get(i).getLatitud(), secciones.get(i).getLongitud()))
+                                                .title(secciones.get(i).getType() + " hasta " + secciones.get(i+1).getNameStation()).icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_album_black_24dp)));
+                                        planeacion.add(w);
+                                    } else if (secciones.get(i).getType().equalsIgnoreCase("Bus")) {
+                                        Marker w = mMap.addMarker(new MarkerOptions().position(new LatLng(secciones.get(i).getLatitud(), secciones.get(i).getLongitud()))
+                                                .title(secciones.get(i).getType() + " hasta " + secciones.get(i+1).getNameStation() + " en " + secciones.get(i).getNameRuta()).icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_album_black_24dp)));
+                                        planeacion.add(w);
+                                    }
+
+
+
                             }
                         }
 
