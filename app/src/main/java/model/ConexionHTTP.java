@@ -169,8 +169,9 @@ public class ConexionHTTP extends Thread{
                         secciones.add(s);
                     }
                 }
-                }
-                terminoProceso = true;
+            }
+
+            terminoProceso = true;
 
         } catch (JSONException e) {
             e.printStackTrace();

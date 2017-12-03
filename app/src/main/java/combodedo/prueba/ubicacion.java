@@ -24,6 +24,7 @@ import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
+import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -82,7 +83,7 @@ public class ubicacion extends AppCompatActivity implements OnMapReadyCallback, 
     private Marker seleccionado,actual;
 
     private int primero,primerZoom;
-    private LatLng sel;
+    private LatLng sel,actualplaneacion;
     private ConexionHTTP conexionHTTP;
     private boolean activosbuses;
     private ArrayList<Seccion> secciones;
@@ -94,11 +95,13 @@ public class ubicacion extends AppCompatActivity implements OnMapReadyCallback, 
     private SharedPreferences sp;
     private SharedPreferences.Editor editor;
     private ArrayList<Polyline> polilineas;
+    private Button ant, des;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         sp = this.getSharedPreferences("com.example.app", Context.MODE_PRIVATE);
         editor = sp.edit();
+        actualplaneacion = null;
         fabparadas = true;
         fabrecargas = true;
         fabsitio = true;
@@ -133,7 +136,6 @@ public class ubicacion extends AppCompatActivity implements OnMapReadyCallback, 
         autocompleteFragment = (PlaceAutocompleteFragment) getFragmentManager().findFragmentById(R.id.place_autocomplete_fragment);
         autocompleteFragment.setOnPlaceSelectedListener(this);
         autocompleteFragment.getView().findViewById(R.id.place_autocomplete_clear_button).setOnClickListener(this);
-
 
         //AutocompleteFilter filter = new AutocompleteFilter.Builder().setTypeFilter(Place.TYPE_ADMINISTRATIVE_AREA_LEVEL_3).setCountry("CO").build();
         //autocompleteFragment.setFilter(filter);
@@ -485,16 +487,15 @@ public class ubicacion extends AppCompatActivity implements OnMapReadyCallback, 
         fab_plan.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
                 if(fabplan){
                     if(seleccionado!=null) {
                         new Planeacion().execute();
                     }else{
 
                         Toast.makeText(getApplicationContext(), "Busca un sitio", Toast.LENGTH_SHORT).show();
-                        setFabPlan(true);
+                        setFabPlan();
                     }
-                    setFabPlan(false);
+                    setFabPlan();
                 }else {
                     for (int i = 0; i < planeacion.size(); i++) {
                         planeacion.get(i).remove();
@@ -502,7 +503,7 @@ public class ubicacion extends AppCompatActivity implements OnMapReadyCallback, 
                     for (int i = 0; i < polilineas.size(); i++) {
                         polilineas.get(i).remove();
                     }
-                    setFabPlan(true);
+                    setFabPlan();
                 }
 
             }
@@ -534,8 +535,12 @@ public class ubicacion extends AppCompatActivity implements OnMapReadyCallback, 
         }
     }
 
-    private void setFabPlan(boolean f) {
-        fabplan = f;
+    private void setFabPlan() {
+        if(fabplan){
+            fabplan = false;
+        }else{
+            fabplan = true;
+        }
     }
 
     public void borrartodosfiltros(View v){
@@ -609,7 +614,7 @@ public class ubicacion extends AppCompatActivity implements OnMapReadyCallback, 
         view.setVisibility(View.GONE);
         seleccionado.remove();
         seleccionado = null;
-        setFabPlan(true);
+        setFabPlan();
     }
 
     @Override
@@ -679,7 +684,7 @@ public class ubicacion extends AppCompatActivity implements OnMapReadyCallback, 
         mMap = googleMap;
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
                 == PackageManager.PERMISSION_GRANTED) {
-            mMap.setMyLocationEnabled(true);
+           mMap.setMyLocationEnabled(true);
         } else {
             // Show rationale and request permission.
         }
@@ -700,26 +705,6 @@ public class ubicacion extends AppCompatActivity implements OnMapReadyCallback, 
 
         mMap.getUiSettings().setCompassEnabled(false);
         mMap.getUiSettings().setMapToolbarEnabled(false);
-
-        // LatLng cali = new LatLng(latitud, longitud);
-        //LatLngBounds centro = new LatLngBounds(
-        //      new LatLng(latitud-1, longitud-1), new LatLng(latitud+1, longitud+1));
-        //  mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(centro.getCenter(), 15));
-        // mMap.addMarker(new MarkerOptions().position(cali).title("Posición actual"));
-        //mMap.moveCamera(CameraUpdateFactory.newLatLng(cali));
-
-        //Toast.makeText(getApplicationContext(), latitud+", "+longitud, Toast.LENGTH_SHORT).show();
-
-
-//        Toast.makeText(getApplicationContext(), ""+ d.get(1).getLatitud()+", "+d.get(1).getLongitud(), Toast.LENGTH_SHORT).show();
-//        latitud = d.get(1).getLatitud();
-//        longitud = d.get(1).getLongitud();
-//        LatLng punto = new LatLng(longitud,latitud);//(d.get(1).getLatitud(), d.get(1).getLongitud());
-//        MarkerOptions mq = new MarkerOptions()
-//                .position(new LatLng(longitud,latitud));
-//        mMap.addMarker(new MarkerOptions()
-//                .position(punto)
-//                .title("punto"));
 
     }
 
@@ -766,9 +751,12 @@ public class ubicacion extends AppCompatActivity implements OnMapReadyCallback, 
         //Toast.makeText(getApplicationContext(), "Actualiza", Toast.LENGTH_SHORT).show();
         if (locacion != null) {
 
-            latitud = locacion.getLatitude();
-            longitud = locacion.getLongitude();
+            //Se modifico
 
+            latitud = 3.342083;
+            longitud = -76.530725;
+
+            Toast.makeText(getApplicationContext(), latitud+""+","+" "+longitud+"", Toast.LENGTH_LONG).show();
             //Modificado
             agregarActual(latitud, longitud);
         }
@@ -779,17 +767,18 @@ public class ubicacion extends AppCompatActivity implements OnMapReadyCallback, 
         public void onLocationChanged(Location location) {
 //            actualizarUbicacion(location);
 
-            if(rutasescogidas == null){
-                rutasescogidas = new ArrayList<String>();
-                rutasescogidas.add("A11");
-                rutasescogidas.add("E21");
-            }
+//            if(rutasescogidas == null){
+//                rutasescogidas = new ArrayList<String>();
+//                rutasescogidas.add("A11");
+//                rutasescogidas.add("E21");
+//            }
+//
+//            System.out.println("------------");
+//            for(int a = 0; a < rutasescogidas.size(); a++){
+//                System.out.println(rutasescogidas.get(a));
+//            }
+//            System.out.println("------------");
 
-            System.out.println("------------");
-            for(int a = 0; a < rutasescogidas.size(); a++){
-                System.out.println(rutasescogidas.get(a));
-            }
-            System.out.println("------------");
               new ActualizacionBuses().execute();
         }
 
@@ -893,7 +882,6 @@ public class ubicacion extends AppCompatActivity implements OnMapReadyCallback, 
                         }
                     }
 
-
                     }
                 }
 
@@ -920,8 +908,8 @@ public class ubicacion extends AppCompatActivity implements OnMapReadyCallback, 
         protected String doInBackground(URL... params) {
 
             conexionHTTP = new ConexionHTTP(rutaa());
-            System.out.println("------------");
-            System.out.println("en ubicacion: "+conexionHTTP.getEstado());
+            //System.out.println("------------");
+            //System.out.println("en ubicacion: "+conexionHTTP.getEstado());
                 try {
                     while (!conexionHTTP.isTerminoProceso()) {
                         // Toast.makeText(getApplicationContext(), "CARGANDO", Toast.LENGTH_SHORT).show();
@@ -950,19 +938,14 @@ public class ubicacion extends AppCompatActivity implements OnMapReadyCallback, 
                 if (conexionHTTP != null) {
                     secciones = conexionHTTP.getSecciones();
 
-
-
                     for (int i = 0; i < secciones.size(); i++) {
                         Seccion s = secciones.get(i);
 
                         LatLng lalo = new LatLng(s.getLatitud(),s.getLongitud());
                         LatLng lalo2 = null;
+
                         if((i+1)<=(secciones.size()-1)) {
                             lalo2 = new LatLng(secciones.get(i + 1).getLatitud(), secciones.get(i + 1).getLongitud());
-                        }
-
-
-                        if((i+1)<=(secciones.size()-1)){
                             if(s.getType().equalsIgnoreCase("Caminar")) {
                                 PolylineOptions lineas = new PolylineOptions().add(lalo).add(lalo2).color(Color.rgb(00,204,00));
                                 Polyline polyline = mMap.addPolyline(lineas);
@@ -976,32 +959,45 @@ public class ubicacion extends AppCompatActivity implements OnMapReadyCallback, 
                             }
                         }
 
-//                        if((i + 1) <= (secciones.size() - 1) && (i + 2) <= (secciones.size() - 1)) {
+                    }
 
-//                            if (!secciones.get(i + 1).getNameStation().equalsIgnoreCase(secciones.get(i + 2).getNameStation())) {
+                    for (int i = 0; i < secciones.size(); i++) {
 
-                                if ((i + 1) <= (secciones.size() - 1)) {
-                                    if (secciones.get(i + 1).getType().equalsIgnoreCase("Caminar")) {
-                                        if(i==0) {
-                                            Marker w = mMap.addMarker(new MarkerOptions().position(lalo)
-                                                    .title(secciones.get(i + 1).getType() + " hasta " + secciones.get(i + 1).getNameStation()));
-                                            planeacion.add(w);
-                                        }else{
-                                            Marker w = mMap.addMarker(new MarkerOptions().position(lalo)
-                                                    .title(secciones.get(i + 1).getType() + " hasta " + secciones.get(i + 1).getNameStation()).icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_album_black_24dp)));
-                                            planeacion.add(w);
-                                        }
-                                    } else if (secciones.get(i + 1).getType().equalsIgnoreCase("Bus")) {
-                                        Marker w = mMap.addMarker(new MarkerOptions().position(lalo)
-                                                .title(secciones.get(i + 1).getType() + " hasta " + secciones.get(i + 1).getNameStation() + " en " + secciones.get(i + 1).getNameRuta()).icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_album_black_24dp)));
-                                        planeacion.add(w);
-                                    }
+                        if (i + 1 <= secciones.size() - 1) {
+                            if(i == 0){
+                                if (secciones.get(i).getType().equalsIgnoreCase("Caminar")) {
+
+                                    Marker p = mMap.addMarker(new MarkerOptions().position(new LatLng(secciones.get(i).getLatitud(), secciones.get(i).getLongitud()))
+                                            .title(secciones.get(i+1).getType() + " hasta " + secciones.get(i+1).getNameStation()));
+                                    planeacion.add(p);
+
+                                }else if (secciones.get(0).getType().equalsIgnoreCase("Bus")) {
+                                    Marker p = mMap.addMarker(new MarkerOptions().position(new LatLng(secciones.get(i).getLatitud(), secciones.get(i).getLongitud()))
+                                            .title(secciones.get(i+1).getType() + " hasta " + secciones.get(i+1).getNameStation() + " en " + secciones.get(i+1).getNameRuta()));
+                                    planeacion.add(p);
                                 }
- //                           }
- //                       }
-
+                            }else if(i>0) {
+                                if (secciones.get(i).getType().equalsIgnoreCase("Caminar")) {
+                                    Marker w = mMap.addMarker(new MarkerOptions().position(new LatLng(secciones.get(i).getLatitud(), secciones.get(i).getLongitud()))
+                                            .title(secciones.get(i + 1).getType() + " hasta " + secciones.get(i + 1).getNameStation()).icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_album_black_24dp)));
+                                    planeacion.add(w);
+                                } else if (secciones.get(i).getType().equalsIgnoreCase("Bus")) {
+                                    Marker w = mMap.addMarker(new MarkerOptions().position(new LatLng(secciones.get(i).getLatitud(), secciones.get(i).getLongitud()))
+                                            .title(secciones.get(i + 1).getType() + " hasta " + secciones.get(i + 1).getNameStation() + " en " + secciones.get(i + 1).getNameRuta()).icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_album_black_24dp)));
+                                    planeacion.add(w);
+                                }
+                            }
+                        }
 
                     }
+
+                    mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(planeacion.get(0).getPosition(), 16));
+                    actualplaneacion = planeacion.get(0).getPosition();
+                    ant = findViewById(R.id.button_antes);
+                    des = findViewById(R.id.button_despues);
+                    ant.setVisibility(View.VISIBLE);
+                    des.setVisibility(View.VISIBLE);
+                    ant.setEnabled(false);
 
                 }
 
@@ -1012,6 +1008,32 @@ public class ubicacion extends AppCompatActivity implements OnMapReadyCallback, 
     public void buscar(View v){
         Intent i = new Intent(this, buscarRutas.class);
         startActivity(i);
+    }
+
+
+
+    public void antes(View v){
+
+//        for(int i = 0 ;i < planeacion.size();i++){
+//            if(actualplaneacion.longitude==planeacion.get(i).getPosition().longitude && actualplaneacion.latitude==planeacion.get(i).getPosition().latitude){
+//                if(i>0){
+//                    mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(planeacion.get(i-1).getPosition(), 16));
+//                }
+//            }
+//        }
+//
+
+    }
+
+    public void despues(View v){
+//        for(int i = 0;i < planeacion.size();i++){
+//            if(i+1<=planeacion.size()-1) {
+//                if (actualplaneacion.longitude == planeacion.get(i).getPosition().longitude && actualplaneacion.latitude == planeacion.get(i).getPosition().latitude) {
+//                    actualplaneacion = planeacion.get(i + 1).getPosition();
+//                    mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(planeacion.get(i + 1).getPosition(), 16));
+//                }
+//            }
+//        }
     }
 
 //    private void locationStart() {
